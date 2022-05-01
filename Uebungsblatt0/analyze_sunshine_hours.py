@@ -1,3 +1,10 @@
+"""
+Gruppe: AG-24
+Abgebende:
+- Kristina Pianykh, pianykhk, 617331
+- Miguel Nuno Carqueijeiro Athouguia, carqueim, 618203
+- Winston Winston, winstonw, 602307
+"""
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
@@ -173,4 +180,3 @@ def get_average_sunshine_hours_per_year(entries: List[Tuple]) -> Dict[int, float
         if None not in month_checker[year]
     }
     return average_sunshine_per_year
-
