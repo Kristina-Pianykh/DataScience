@@ -267,6 +267,18 @@ def aufgabe_b6() -> List[Tuple[str, float]]:
 
     :return: Drei-elementige Liste mit den Todesursachen mit den höchsten Schwankungen.
     """
+    data: pd.DataFrame = read_data("todesursachen.csv")
+    grouped = data[["Todesursache", "Anzahl"]].groupby(["Todesursache"]).agg(["mean", "std"])
+    grouped["relative std"] = grouped["Anzahl"]["std"] / grouped["Anzahl"]["mean"]
+    least_3std = grouped[["relative std"]].sort_values(by="relative std").head(3).to_dict()
+    least_std_flat_dict = [least_3std[key] for key in least_3std][0]
+    deaths_least_std = []
+
+    for key in least_std_flat_dict:
+        deaths_least_std.append((key, round(least_std_flat_dict[key], 4)))
+    
+    deaths_least_std = sorted(deaths_least_std, key=lambda item: item[1], reverse=True)
+    return deaths_least_std
 
     raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
 
