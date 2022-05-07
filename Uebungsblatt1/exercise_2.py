@@ -12,21 +12,8 @@ from numpy.typing import NDArray
 from scipy.stats import iqr
 
 # Die Eingabedatei muss im gleichen Verzeichnis liegen wie die Skriptdatei exercise_2
-input_file = Path("todesursachen.tsv")
-
-# TODO: Hier das Einlesen der Daten implementieren! Auf die Daten kann dann in jeder Funktion zugegriffen werden.
-
-
-def read_data(input_file: Path) -> pd.DataFrame:
-    """
-    Liest die gemessenen Sonnenscheindaten aus der Datei file in eine von Ihnen zu wählende Tuple-Datenstruktur ein.
-    Das gewählte Tuple-Format definiert den Eingabedatentyp der folgenden Analysefunktionen.
-
-    :param input_file: Pfad zur Eingabedatei
-    :return: Alle Einträge aus der Eingabedatei als Liste von Tupeln
-    """
-    data = pd.read_csv(input_file, sep=";", header=0)
-    return data
+input_file = Path("todesursachen.csv")
+data: pd.DataFrame = pd.read_csv(input_file, sep=";", header=0)
 
 def aufgabe_a1() -> int:
     """
@@ -34,7 +21,7 @@ def aufgabe_a1() -> int:
 
     :return: Anzahl der verschiedenen Todesursachen im Datensatz (als int)
     """
-    data: pd.DataFrame = read_data("todesursachen.csv")
+    # data: pd.DataFrame = read_data("todesursachen.csv")
     unique_deaths = data["Todesursache"].unique().size
     return unique_deaths
     raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
@@ -61,7 +48,6 @@ def aufgabe_a2() -> Dict[str, Dict[str, Union[int, float]]]:
 
     :return: Dictionary mit den Kennzahlen
     """
-    data: pd.DataFrame = read_data("todesursachen.csv")
     stats_to_each_year: Dict[str, Dict[str, Union[int, float]]] = {}
 
     deaths_per_year: Dict[int, NDArray] = {} # because nan is of type float in numpy
@@ -109,7 +95,6 @@ def aufgabe_a3() -> Dict[int, str]:
 
     :return: Dictionary, welches ein Jahr (int) auf die Anzahl an verstorbenen Kindern (int) abbildet.
     """
-    data: pd.DataFrame = read_data("todesursachen.csv")
     kids_10 = data[
         ((data["Altersgruppe"] == "unter 1 Jahr") | (data["Altersgruppe"] == "1 bis unter 15 Jahre"))
         & (data["Anzahl"] >= 10)
@@ -129,7 +114,6 @@ def aufgabe_b1() -> int:
 
     :return: Jahr (int) in dem am meisten Männer durch Stürze ums Leben gekommen sind
     """
-    data: pd.DataFrame = read_data("todesursachen.csv")
     final_data = data[
         (data["Geschlecht"] == "männlich") & (data["Todesursache"] == "Stürze")
     ].groupby(["Jahr"]).sum()
@@ -154,7 +138,6 @@ def aufgabe_b2() -> Tuple[float, float]:
 
     :return: (<Durchschnitt-Kinder (float)>, <Durchschnitt-Renter*innen (float)>)
     """
-    data: pd.DataFrame = read_data("todesursachen.csv")
     kids_age_groups = [
         "unter 1 Jahr",
         "1 bis unter 15 Jahre"
@@ -182,7 +165,6 @@ def aufgabe_b3() -> str:
 
     :return: Altersgruppe mit dem größten Median hinsichtlich der Anzahl an Verstorbenen pro Jahr
     """
-    data: pd.DataFrame = read_data("todesursachen.csv")
     age_groups_medians: pd.DataFrame = data[["Altersgruppe", "Anzahl"]][(data["Anzahl"] != 0)].groupby(["Altersgruppe"]).median()
     age_groups_medians: pd.DataFrame = age_groups_medians.reset_index()
     age_with_big_median: str = age_groups_medians[age_groups_medians["Anzahl"] == age_groups_medians["Anzahl"].max()]["Altersgruppe"].values[0]
@@ -199,7 +181,6 @@ def aufgabe_b4() -> float:
 
     :return: Anteil der Jahre in denen mehr Frauen als Männer verstorben sind (als float)
     """
-    data: pd.DataFrame = read_data("todesursachen.csv")
     men_women_grouped_by_year = data.groupby(["Jahr", "Geschlecht"]).sum()
     total_years = men_women_grouped_by_year.size
     unique_years = data["Jahr"].unique()
@@ -234,7 +215,6 @@ def aufgabe_b5() -> List[Tuple[float, float]]:
 
     :return: Drei-elementige Liste mit den Todesursachen mit den größten Unterschieden zwischen Männern und Frauen.
     """
-    data: pd.DataFrame = read_data("todesursachen.csv")
     age_groups = ['20 bis unter 25 Jahre', '25 bis unter 30 Jahre']
     av_sex_per_year_and_deathcause = data[(data["Altersgruppe"].isin(age_groups))].groupby(["Todesursache", "Jahr", "Geschlecht"]).mean()
     pivoted_df = av_sex_per_year_and_deathcause["Anzahl"].unstack(level=-1)
@@ -267,7 +247,6 @@ def aufgabe_b6() -> List[Tuple[str, float]]:
 
     :return: Drei-elementige Liste mit den Todesursachen mit den höchsten Schwankungen.
     """
-    data: pd.DataFrame = read_data("todesursachen.csv")
     grouped = data[["Todesursache", "Anzahl"]].groupby(["Todesursache"]).agg(["mean", "std"])
     grouped["relative std"] = grouped["Anzahl"]["std"] / grouped["Anzahl"]["mean"]
     least_3std = grouped[["relative std"]].sort_values(by="relative std").head(3).to_dict()
