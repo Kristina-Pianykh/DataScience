@@ -1,3 +1,14 @@
+"""
+This script bootstraps 1000 samples with 80 items per
+sample from einkommen.txt 10 times.
+
+Each time it calculates the standard error and the
+75%-confidence interval of medians.
+
+In the end it prints the mean values as well as standard deviation for
+lower and upper bounds of the computed 75%-confidence intervals
+"""
+
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
