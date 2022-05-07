@@ -1,7 +1,9 @@
 # ---------------------------------------------------------------------------------------
 # Abgabegruppe: 24
 # Personen:
-#
+# - Kristina Pianykh, pianykhk, 617331
+# - Miguel Nuno Carqueijeiro Athouguia, carqueim, 618203
+# - Winston Winston, winstonw, 602307
 # -------------------------------------------------------------------------------------
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
