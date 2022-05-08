@@ -23,7 +23,6 @@ def aufgabe_a1() -> int:
 
     :return: Anzahl der verschiedenen Todesursachen im Datensatz (als int)
     """
-    # data: pd.DataFrame = read_data("todesursachen.csv")
     unique_deaths = data["Todesursache"].unique().size
     return unique_deaths
     raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
@@ -50,28 +49,9 @@ def aufgabe_a2() -> Dict[str, Union[int, float]]:
 
     :return: Dictionary mit den Kennzahlen
     """
-    # death_stats: Dict[str, Union[int, float]] = {
-    #     "mean": 0.0,
-    #     "med": 0,
-    #     "stddev": 0.0,
-    #     "min": 0.0,
-    #     "max": 0,
-    #     "iqr": 0.0,
-    #     "90p": 0>
-    # }
     death_stats: Dict[str, Union[int, float]] = {}
     deaths = data.groupby(["Jahr"]).sum()["Anzahl"]
-    # stats_to_each_year: Dict[str, Dict[str, Union[int, float]]] = {}
 
-    # deaths_per_year: Dict[int, NDArray] = {} # because nan is of type float in numpy
-    # unique_years: np.ndarray = data["Jahr"].unique()
-    # for year in unique_years:
-    #     deaths_per_year[year] = data[(data["Jahr"] == year) & (data["Anzahl"] != 0)]["Anzahl"]
-
-    # for year in deaths_per_year:
-    #     deaths: NDArray = deaths_per_year[year]
-    #     str_year = str(year)
-    #     stats_to_each_year[str_year] = {}
     death_stats["mean"] = round(float(np.mean(deaths)), 4)
     death_stats["median"] = int(np.median(deaths))
     death_stats["stddev"] = round(float(np.std(deaths, ddof=1)), 4)
@@ -81,18 +61,6 @@ def aufgabe_a2() -> Dict[str, Union[int, float]]:
     death_stats["90p"] = int(np.percentile(deaths, 90))
 
     return death_stats
-
-        # stats_to_each_year[str_year]["mean"] = round(float(deaths.mean()), 3)
-        # stats_to_each_year[str_year]["median"] = int(deaths.median())
-        # stats_to_each_year[str_year]["stddev"] = round(deaths.std(ddof=1), 3)
-        # stats_to_each_year[str_year]["min"] = float(deaths.min())
-        # stats_to_each_year[str_year]["max"] = int(deaths.max())
-        # stats_to_each_year[str_year]["iqr"] = float(iqr(deaths))
-        # stats_to_each_year[str_year]["90p"] = int(np.percentile(deaths, 90))
-    
-    # return stats_to_each_year
-
-    
 
     raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
 
