@@ -29,7 +29,7 @@ def aufgabe_a1() -> int:
     raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
 
 
-def aufgabe_a2() -> Dict[str, Dict[str, Union[int, float]]]:
+def aufgabe_a2() -> Dict[str, Union[int, float]]:
     """
     Geben Sie den Durchschnitt (mean), den Median (med), die Standardabweichung (stddev), den minimalen Wert (min),
     den maximalen Wert (max), den Interquartilsabstand (iqr) und das 90%-Perzentil (90p) der Verstorbenen pro Jahr
@@ -50,27 +50,47 @@ def aufgabe_a2() -> Dict[str, Dict[str, Union[int, float]]]:
 
     :return: Dictionary mit den Kennzahlen
     """
-    stats_to_each_year: Dict[str, Dict[str, Union[int, float]]] = {}
+    # death_stats: Dict[str, Union[int, float]] = {
+    #     "mean": 0.0,
+    #     "med": 0,
+    #     "stddev": 0.0,
+    #     "min": 0.0,
+    #     "max": 0,
+    #     "iqr": 0.0,
+    #     "90p": 0>
+    # }
+    death_stats: Dict[str, Union[int, float]] = {}
+    deaths = data.groupby(["Jahr"]).sum()["Anzahl"]
+    # stats_to_each_year: Dict[str, Dict[str, Union[int, float]]] = {}
 
-    deaths_per_year: Dict[int, NDArray] = {} # because nan is of type float in numpy
-    unique_years: np.ndarray = data["Jahr"].unique()
-    for year in unique_years:
-        deaths_per_year[year] = data[(data["Jahr"] == year) & (data["Anzahl"] != 0)]["Anzahl"]
+    # deaths_per_year: Dict[int, NDArray] = {} # because nan is of type float in numpy
+    # unique_years: np.ndarray = data["Jahr"].unique()
+    # for year in unique_years:
+    #     deaths_per_year[year] = data[(data["Jahr"] == year) & (data["Anzahl"] != 0)]["Anzahl"]
 
-    for year in deaths_per_year:
-        deaths: NDArray = deaths_per_year[year]
-        str_year = str(year)
-        stats_to_each_year[str_year] = {}
+    # for year in deaths_per_year:
+    #     deaths: NDArray = deaths_per_year[year]
+    #     str_year = str(year)
+    #     stats_to_each_year[str_year] = {}
+    death_stats["mean"] = round(float(np.mean(deaths)), 4)
+    death_stats["median"] = int(np.median(deaths))
+    death_stats["stddev"] = round(float(np.std(deaths, ddof=1)), 4)
+    death_stats["min"] = float(deaths.min())
+    death_stats["max"] = int(deaths.max())
+    death_stats["iqr"] = round(float(iqr(deaths)), 4)
+    death_stats["90p"] = int(np.percentile(deaths, 90))
 
-        stats_to_each_year[str_year]["mean"] = round(float(deaths.mean()), 3)
-        stats_to_each_year[str_year]["median"] = int(deaths.median())
-        stats_to_each_year[str_year]["stddev"] = round(deaths.std(ddof=1), 3)
-        stats_to_each_year[str_year]["min"] = float(deaths.min())
-        stats_to_each_year[str_year]["max"] = int(deaths.max())
-        stats_to_each_year[str_year]["iqr"] = float(iqr(deaths))
-        stats_to_each_year[str_year]["90p"] = int(np.percentile(deaths, 90))
+    return death_stats
+
+        # stats_to_each_year[str_year]["mean"] = round(float(deaths.mean()), 3)
+        # stats_to_each_year[str_year]["median"] = int(deaths.median())
+        # stats_to_each_year[str_year]["stddev"] = round(deaths.std(ddof=1), 3)
+        # stats_to_each_year[str_year]["min"] = float(deaths.min())
+        # stats_to_each_year[str_year]["max"] = int(deaths.max())
+        # stats_to_each_year[str_year]["iqr"] = float(iqr(deaths))
+        # stats_to_each_year[str_year]["90p"] = int(np.percentile(deaths, 90))
     
-    return stats_to_each_year
+    # return stats_to_each_year
 
     
 
@@ -275,8 +295,8 @@ if __name__ == "__main__":
 
     print("\t2: Kennzahlen der Verstorbenen pro Jahr:")
     kennzahlen = aufgabe_a2()
-    # for key in sorted(kennzahlen.keys()):
-    #     print(f"\t\t{key}: {round(kennzahlen[key], 1)}")
+    for key in sorted(kennzahlen.keys()):
+        print(f"\t\t{key}: {round(kennzahlen[key], 1)}")
     print()
 
     print("\t3: Anzahl der verstorbenen Kinder bzw. Heranwachsenden (< 15 Jahre) pro Jahr:")
