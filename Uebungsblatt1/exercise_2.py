@@ -140,9 +140,9 @@ def aufgabe_b2() -> Tuple[float, float]:
         "85 Jahre und mehr"
     ]
     drowned_set = data[(data["Todesursache"] == "Ertrinken und Untergehen")]
-    drowned_kids = drowned_set[drowned_set["Altersgruppe"].isin(kids_age_groups)]["Anzahl"].sum()
-    drowned_old_fucks = drowned_set[drowned_set["Altersgruppe"].isin(old_age_groups)]["Anzahl"].sum()
-    return (float(drowned_kids), float(drowned_old_fucks))
+    drowned_kids = drowned_set[drowned_set["Altersgruppe"].isin(kids_age_groups)].groupby(["Jahr"]).sum()["Anzahl"]
+    drowned_old_fucks = drowned_set[drowned_set["Altersgruppe"].isin(old_age_groups)].groupby(["Jahr"]).sum()["Anzahl"]
+    return (round(np.mean(drowned_kids), 4), round(np.mean(drowned_old_fucks), 4))
 
     raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
 
@@ -155,9 +155,9 @@ def aufgabe_b3() -> str:
 
     :return: Altersgruppe mit dem größten Median hinsichtlich der Anzahl an Verstorbenen pro Jahr
     """
-    age_groups_medians: pd.DataFrame = data[["Altersgruppe", "Anzahl"]][(data["Anzahl"] != 0)].groupby(["Altersgruppe"]).median()
-    age_groups_medians: pd.DataFrame = age_groups_medians.reset_index()
-    age_with_big_median: str = age_groups_medians[age_groups_medians["Anzahl"] == age_groups_medians["Anzahl"].max()]["Altersgruppe"].values[0]
+    # age_groups_medians: pd.DataFrame = data.groupby(["Altersgruppe", "Jahr"]).median().reset_index()
+    age_groups_medians = data.groupby(["Altersgruppe", "Jahr"]).sum("Anzahl").reset_index().groupby(["Altersgruppe"]).median()
+    age_with_big_median = age_groups_medians[age_groups_medians["Anzahl"] == age_groups_medians["Anzahl"].max()].reset_index()["Altersgruppe"].values[0]
 
     return age_with_big_median
     raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
@@ -172,13 +172,13 @@ def aufgabe_b4() -> float:
     :return: Anteil der Jahre in denen mehr Frauen als Männer verstorben sind (als float)
     """
     men_women_grouped_by_year = data.groupby(["Jahr", "Geschlecht"]).sum()
-    total_years = men_women_grouped_by_year.size
     unique_years = data["Jahr"].unique()
+    total_years = len(unique_years)
     years_more_women_died = 0
 
     for year in unique_years:
-        men_died: int = men_women_grouped_by_year.loc[1980].loc["männlich"].values[0]
-        women_died: int = men_women_grouped_by_year.loc[1980].loc["weiblich"].values[0]
+        men_died: int = men_women_grouped_by_year.loc[year].loc["männlich"].values[0]
+        women_died: int = men_women_grouped_by_year.loc[year].loc["weiblich"].values[0]
         if women_died > men_died:
             years_more_women_died += 1
 
@@ -205,14 +205,15 @@ def aufgabe_b5() -> List[Tuple[float, float]]:
 
     :return: Drei-elementige Liste mit den Todesursachen mit den größten Unterschieden zwischen Männern und Frauen.
     """
+    death_causes_with_largest_diffs: List[Tuple[float, float]] = []
     age_groups = ['20 bis unter 25 Jahre', '25 bis unter 30 Jahre']
-    av_sex_per_year_and_deathcause = data[(data["Altersgruppe"].isin(age_groups))].groupby(["Todesursache", "Jahr", "Geschlecht"]).mean()
-    pivoted_df = av_sex_per_year_and_deathcause["Anzahl"].unstack(level=-1)
+    df = data[(data["Altersgruppe"].isin(age_groups))].groupby(["Todesursache", "Jahr", "Geschlecht"]).sum().groupby(["Todesursache", "Geschlecht"]).mean()
+    pivoted_df = df["Anzahl"].unstack(level=-1)
     pivoted_df["diff"] = abs(pivoted_df["männlich"] - pivoted_df["weiblich"])
-    biggest_diffs: pd.Series = pivoted_df["diff"].sort_values(ascending=False)[:3]
-    biggest_diffs_dict = biggest_diffs.to_dict()
-    death_causes_with_largest_diffs = [(key[0], biggest_diffs_dict[key]) for key in biggest_diffs_dict]
+    pivoted_df = pivoted_df.sort_values(by="diff", ascending=False).head(3)
 
+    for row in pivoted_df.itertuples():
+        death_causes_with_largest_diffs.append((row[0], row[-1]))
     return death_causes_with_largest_diffs
 
     raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
@@ -237,16 +238,15 @@ def aufgabe_b6() -> List[Tuple[str, float]]:
 
     :return: Drei-elementige Liste mit den Todesursachen mit den höchsten Schwankungen.
     """
-    grouped = data[["Todesursache", "Anzahl"]].groupby(["Todesursache"]).agg(["mean", "std"])
-    grouped["relative std"] = grouped["Anzahl"]["std"] / grouped["Anzahl"]["mean"]
-    least_3std = grouped[["relative std"]].sort_values(by="relative std").head(3).to_dict()
-    least_std_flat_dict = [least_3std[key] for key in least_3std][0]
-    deaths_least_std = []
+    deaths_least_std: List[Tuple[str, float]] = []
+    mean = data[["Todesursache", "Jahr", "Anzahl"]].groupby(["Todesursache", "Jahr"]).sum().reset_index().groupby("Todesursache").mean()
+    stds = data[["Todesursache", "Jahr", "Anzahl"]].groupby(["Todesursache", "Jahr"]).sum().reset_index().groupby("Todesursache").std()
+    mean["relative_std"] = stds["Anzahl"] / mean["Anzahl"]
+    df = mean.sort_values(by="relative_std", ascending=1).head(3).reset_index()
 
-    for key in least_std_flat_dict:
-        deaths_least_std.append((key, round(least_std_flat_dict[key], 4)))
-    
-    deaths_least_std = sorted(deaths_least_std, key=lambda item: item[1], reverse=True)
+    for entry in df.sort_values(by="relative_std", ascending=1).head(3).reset_index().itertuples():
+        deaths_least_std.append((entry[2], round(entry[-1], 4)))
+
     return deaths_least_std
 
     raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
