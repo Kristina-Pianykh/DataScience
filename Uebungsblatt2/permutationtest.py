@@ -109,13 +109,6 @@ def get_elements_by_idx(idx_set: Set[int], lookup_lst: List[float]) -> List[floa
     return [lookup_lst[idx] for idx in idx_set]
 
 
-def remainder(original_lst: List[float], sublst: List[float]) -> List[float]:
-    remaining_lst = deep_copy(original_lst)
-    for item in sublst:
-        if item in remaining_lst:
-            remaining_lst.remove(item)
-    return remaining_lst 
-
 
 def run_exact_permutationtest(samples1: List[float], samples2: List[float]) -> Tuple[float, float]:
     """
@@ -151,7 +144,7 @@ def run_exact_permutationtest(samples1: List[float], samples2: List[float]) -> T
         mean_diffs.append(get_mean(sample2) - get_mean(sample1))
     
     relevant_mean_diffs = [value for value in mean_diffs if abs(value) >= abs(observed_mean_diff)]
-    p_value = len(relevant_mean_diffs) / len(mean_diffs)
+    p_value = float(len(relevant_mean_diffs) / len(mean_diffs))
 
     return (round(observed_mean_diff, 4), round(p_value, 4))
     raise NotImplementedError("ToDo: Funktsudo apt install fonts-firacodeion muss implementiert werden.")
@@ -189,8 +182,9 @@ def run_approx_permutationtest(samples1: List[float], samples2: List[float], n: 
         sample2: List[float] = get_elements_by_idx(sample2_indices, both_samples)
         mean_diffs.append(get_mean(sample2) - get_mean(sample1))
 
-    print(len([val for val in mean_diffs if abs(val) >= abs(observed_mean_diff)]))
-    p_value = float(len([val for val in mean_diffs if abs(val) >= abs(observed_mean_diff)]) / len(mean_diffs))
+    relevant_mean_diffs = [value for value in mean_diffs if abs(value) >= abs(observed_mean_diff)]
+    p_value = float(len(relevant_mean_diffs) / len(mean_diffs))
+    # p_value = float(len([val for val in mean_diffs if abs(val) >= abs(observed_mean_diff)]) / len(mean_diffs))
     return (round(observed_mean_diff, 4), round(p_value, 4))
     raise NotImplementedError("ToDo: Funktion muss implementiert werden.")
 
