@@ -7,9 +7,8 @@
 # -------------------------------------------------------------------------------------
 import random
 import sys
-import typing
 from pathlib import Path
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, TypeVar, Generic
 
 USAGE_TEXT = """
 Das Skript wurde mit der falschen Anzahl an Parametern aufgerufen.
@@ -24,54 +23,41 @@ Die korrekte Aufrufsyntax ist:
 Beispiel:
 
     python permutationtest.py sample1.txt sample2.txt 0.05 exact
-        
+
         oder
-    
+
     python permutationtest.py sample1.txt sample2.txt 0.05 approx 10000
-                        
+
 """
 
 
-SampleGroup = Tuple[Set[int], Set[int]]
+TValue = TypeVar("TValue", bound=int)
 
-TValue = typing.TypeVar("TValue", bound=int)
-
-
-class HashableSet(set, typing.Generic[TValue]):
+class HashableSet(set, Generic[TValue]):
     def __hash__(self) -> int:
         """Calculate the hash by adding the weighted by idx sum for values
         as values are sorted in a set."""
         return sum(i + v for i, v in enumerate(self))
 
 
-def generate_sample(all_idxs: range, sample_size: int) -> HashableSet[int]:
-    sample = random.sample(all_idxs, sample_size)
-    return HashableSet(sample)
+IdxSampleGroups = Tuple[Set[int], Set[int]]
 
-
-def generate_sample_groups(num_samples: int, all_idx_set: Set[int]) -> List[SampleGroup]:
-    samples: set[HashableSet[int]] = set()
-    all_idxs = range(len(all_idx_set))
-    sample_size = int(len(all_idx_set) / 2)
+def generate_idx_sample_groups(num_idxs: int, first_group_size: int, num_samples: int) -> list[IdxSampleGroups]:
+    samples: Set[HashableSet[int]] = set()
+    idxs = range(num_idxs)
     while len(samples) < num_samples:
-        sample = generate_sample(all_idxs, sample_size)
-        samples.add(sample)
-    sample_groups: list[SampleGroup] = []
+        sample = random.sample(idxs, first_group_size)
+        samples.add(HashableSet(sample))
+    sample_groups: List[IdxSampleGroups] = []
+    idxs_set = set(idxs)
     for sample in samples:
-        other_sample = all_idx_set.difference(sample)
+        other_sample = idxs_set.difference(sample)
         sample_groups.append((set(sample), other_sample))
     return sample_groups
 
 
-def test_sample_group(sample_group: SampleGroup, sample_size: int):
-    sample, other_sample = sample_group
-    all_elements = {*sample, *other_sample}
-    assert len(all_elements) == 2 * sample_size
-
-
 def get_mean(lst: List[float]) -> float:
     return float(sum(lst) / len(lst))
-
 
 
 def read_values(input_file: Path) -> List[float]:
@@ -82,21 +68,21 @@ def read_values(input_file: Path) -> List[float]:
 
 
 def n_choose_k(lst: List[int], k: int) -> List[List[int]]:
-     
+
     if k == 0:
         return [[]]
-     
+
     combinations: List[List[int]] = []
     for i in range(0, len(lst)):
         m = lst[i]
         remaining = lst[0:i] + lst[i + 1:]
-         
+
         remainlst_combo = n_choose_k(remaining, k-1)
         for pick in remainlst_combo:
             new_combination = sorted([m, *pick])
             if new_combination not in combinations:
                 combinations.append(new_combination)
-           
+
     return combinations
 
 
@@ -122,7 +108,6 @@ def run_exact_permutationtest(samples1: List[float], samples2: List[float]) -> T
     :param samples2: Liste der beobachteten Werte aus der zweiten Stichprobe
     :return: Tuple bestehend aus der Differenz der Mittelwerte und dem p-Wert des Tests: (mean-diff,p)
     """
-    sample_size = len(samples1)
     observed_mean_diff = get_mean(samples2) - get_mean(samples1)
     mean_diffs: List[float] = []
     both_samples = samples1 + samples2
@@ -131,18 +116,14 @@ def run_exact_permutationtest(samples1: List[float], samples2: List[float]) -> T
     ranked_combinations: List[List[int]] = n_choose_k(samples_ranks, int(len(both_samples) / 2))
     for sample1_indices in ranked_combinations:
         sample2_indices = set(samples_ranks).difference(sample1_indices)
-        sample_group: SampleGroup = (set(sample1_indices), sample2_indices)
-        test_sample_group(sample_group, sample_size)
-
         sample1: List[float] = get_elements_by_idx(set(sample1_indices), both_samples)
         sample2: List[float] = get_elements_by_idx(set(sample2_indices), both_samples)
         mean_diffs.append(get_mean(sample2) - get_mean(sample1))
-    
+
     relevant_mean_diffs = [value for value in mean_diffs if abs(value) >= abs(observed_mean_diff)]
     p_value = float(len(relevant_mean_diffs) / len(mean_diffs))
 
     return (round(observed_mean_diff, 4), round(p_value, 4))
-    raise NotImplementedError("ToDo: Funktsudo apt install fonts-firacodeion muss implementiert werden.")
 
 
 def run_approx_permutationtest(samples1: List[float], samples2: List[float], n: int) -> Tuple[float, float]:
@@ -165,12 +146,8 @@ def run_approx_permutationtest(samples1: List[float], samples2: List[float], n: 
     """
     sample_size = len(samples1)
     both_samples: List[float] = samples1 + samples2
-    all_idx_set: Set[int] = set(idx for idx in range(len(both_samples)))
     observed_mean_diff = float(get_mean(samples2) - get_mean(samples1))
-    sample_indices: List[SampleGroup] = generate_sample_groups(n, all_idx_set)
-
-    for sample_group in sample_indices:
-        test_sample_group(sample_group, sample_size)
+    sample_indices: List[IdxSampleGroups] = generate_idx_sample_groups(len(samples1) + len(samples2), sample_size, n)
 
     mean_diffs: List[float] = []
     for sample1_indices, sample2_indices in sample_indices:
@@ -180,8 +157,8 @@ def run_approx_permutationtest(samples1: List[float], samples2: List[float], n: 
 
     relevant_mean_diffs = [value for value in mean_diffs if abs(value) >= abs(observed_mean_diff)]
     p_value = float(len(relevant_mean_diffs) / len(mean_diffs))
+    # p_value = float(len([val for val in mean_diffs if abs(val) >= abs(observed_mean_diff)]) / len(mean_diffs))
     return (round(observed_mean_diff, 4), round(p_value, 4))
-    raise NotImplementedError("ToDo: Funktion muss implementiert werden.")
 
 
 if __name__ == "__main__":
