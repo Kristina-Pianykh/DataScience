@@ -31,9 +31,6 @@ Beispiel:
                         
 """
 
-N = 80
-SAMPLE_SIZE = 80
-ALL_IDXS = range(2 * N)
 
 SampleGroup = Tuple[Set[int], Set[int]]
 
@@ -47,15 +44,17 @@ class HashableSet(set, typing.Generic[TValue]):
         return sum(i + v for i, v in enumerate(self))
 
 
-def generate_sample() -> HashableSet[int]:
-    sample = random.sample(ALL_IDXS, SAMPLE_SIZE)
+def generate_sample(all_idxs: range, sample_size: int) -> HashableSet[int]:
+    sample = random.sample(all_idxs, sample_size)
     return HashableSet(sample)
 
 
 def generate_sample_groups(num_samples: int, all_idx_set: Set[int]) -> List[SampleGroup]:
     samples: set[HashableSet[int]] = set()
+    all_idxs = range(len(all_idx_set))
+    sample_size = int(len(all_idx_set) / 2)
     while len(samples) < num_samples:
-        sample = generate_sample()
+        sample = generate_sample(all_idxs, sample_size)
         samples.add(sample)
     sample_groups: list[SampleGroup] = []
     for sample in samples:
@@ -181,7 +180,6 @@ def run_approx_permutationtest(samples1: List[float], samples2: List[float], n: 
 
     relevant_mean_diffs = [value for value in mean_diffs if abs(value) >= abs(observed_mean_diff)]
     p_value = float(len(relevant_mean_diffs) / len(mean_diffs))
-    # p_value = float(len([val for val in mean_diffs if abs(val) >= abs(observed_mean_diff)]) / len(mean_diffs))
     return (round(observed_mean_diff, 4), round(p_value, 4))
     raise NotImplementedError("ToDo: Funktion muss implementiert werden.")
 
