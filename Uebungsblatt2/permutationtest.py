@@ -8,7 +8,7 @@
 import random
 import sys
 from pathlib import Path
-from typing import List, Set, Tuple, TypeVar, Generic
+from typing import Generic, List, Set, Tuple, TypeVar
 
 USAGE_TEXT = """
 Das Skript wurde mit der falschen Anzahl an Parametern aufgerufen.
@@ -42,7 +42,7 @@ class HashableSet(set, Generic[TValue]):
 
 IdxSampleGroups = Tuple[Set[int], Set[int]]
 
-def generate_idx_sample_groups(num_idxs: int, first_group_size: int, num_samples: int) -> list[IdxSampleGroups]:
+def generate_idx_sample_groups(num_idxs: int, first_group_size: int, num_samples: int) -> List[IdxSampleGroups]:
     samples: Set[HashableSet[int]] = set()
     idxs = range(num_idxs)
     while len(samples) < num_samples:
@@ -157,7 +157,6 @@ def run_approx_permutationtest(samples1: List[float], samples2: List[float], n: 
 
     relevant_mean_diffs = [value for value in mean_diffs if abs(value) >= abs(observed_mean_diff)]
     p_value = float(len(relevant_mean_diffs) / len(mean_diffs))
-    # p_value = float(len([val for val in mean_diffs if abs(val) >= abs(observed_mean_diff)]) / len(mean_diffs))
     return (round(observed_mean_diff, 4), round(p_value, 4))
 
 
