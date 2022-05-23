@@ -34,7 +34,6 @@ Beispiel:
 N = 80
 SAMPLE_SIZE = 80
 ALL_IDXS = range(2 * N)
-ALL_IDXS_SET = set(ALL_IDXS)
 
 SampleGroup = Tuple[Set[int], Set[int]]
 
@@ -53,14 +52,14 @@ def generate_sample() -> HashableSet[int]:
     return HashableSet(sample)
 
 
-def generate_sample_groups(num_samples: int) -> List[SampleGroup]:
+def generate_sample_groups(num_samples: int, all_idx_set: Set[int]) -> List[SampleGroup]:
     samples: set[HashableSet[int]] = set()
     while len(samples) < num_samples:
         sample = generate_sample()
         samples.add(sample)
     sample_groups: list[SampleGroup] = []
     for sample in samples:
-        other_sample = ALL_IDXS_SET.difference(sample)
+        other_sample = all_idx_set.difference(sample)
         sample_groups.append((set(sample), other_sample))
     return sample_groups
 
@@ -74,9 +73,6 @@ def test_sample_group(sample_group: SampleGroup, sample_size: int):
 def get_mean(lst: List[float]) -> float:
     return float(sum(lst) / len(lst))
 
-
-def deep_copy(lst: List[float]) -> List[float]:
-    return [item for item in lst]
 
 
 def read_values(input_file: Path) -> List[float]:
@@ -170,8 +166,9 @@ def run_approx_permutationtest(samples1: List[float], samples2: List[float], n: 
     """
     sample_size = len(samples1)
     both_samples: List[float] = samples1 + samples2
+    all_idx_set: Set[int] = set(idx for idx in range(len(both_samples)))
     observed_mean_diff = float(get_mean(samples2) - get_mean(samples1))
-    sample_indices: List[SampleGroup] = generate_sample_groups(n)
+    sample_indices: List[SampleGroup] = generate_sample_groups(n, all_idx_set)
 
     for sample_group in sample_indices:
         test_sample_group(sample_group, sample_size)
