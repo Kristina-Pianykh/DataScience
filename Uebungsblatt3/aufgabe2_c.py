@@ -64,7 +64,7 @@ def boxplot(series1: pd.Series, series2: pd.Series, boxplot_name: str):
 
     sns.boxplot(ax=axes[0], data=series1.to_frame())
     sns.boxplot(ax=axes[1], data=series2.to_frame())
-    plt.savefig(boxplot_name)
+    # plt.savefig(boxplot_name)
     # plt.show()
 
 
@@ -102,6 +102,35 @@ def aufgabe(
     print(f"p-value={test2.pvalue}\n")
 
 
+def aufgabe_ii(series: pd.Series, alternative: str, category: str, test: Callable):
+
+    print(f"Mean duration of stay in {category}: {series.mean()}\n")
+
+    normality_test(series, f"{category}")  # non-normal distribution
+
+    sns.set_style("whitegrid")
+    plot = sns.boxplot(data=series.to_frame())
+    # plot.set_ylabel("Reaction time in seconds")
+    # plt.savefig("A3cii_boxplot.png")
+    # plt.show()
+
+    # print(f"The outlier in the sample for Cinic 2: {max(duration_2)}\n")
+
+    test = test(series, alternative)
+    print(
+        f"Results of the non-parametric one-tailed Wilcoxon signed-rank test for {category}:"
+    )
+    print(f"statisic={test.statistic}")
+    print(f"p-value={test.pvalue}\n")
+
+    # test2 = wilcoxon(duration_2, alternative)
+    # print(
+    #     f"Results of the non-parametric one-tailed Wilcoxon signed-rank test for {category} 2:"
+    # )
+    # print(f"statisic={test2.statistic}")
+    # print(f"p-value={test2.pvalue}\n")
+
+
 def main():
     file = Path("heroin.dat")
     data = read_values(file)
@@ -109,14 +138,13 @@ def main():
     duration_1 = data[data["Clinic-ID"] == 1]["Duration"]
     duration_2 = data[data["Clinic-ID"] == 2]["Duration"]
 
-    dose_1 = data[data["Clinic-ID"] == 1]["Dose"]
-    dose_2 = data[data["Clinic-ID"] == 2]["Dose"]
+    dose = data["Dose"]
 
     # aufgabe i)
-    aufgabe(duration_1, duration_2, "less", "Clinic", wilcoxon, "A2ci_boxplots.png")
+    # aufgabe(duration_1, duration_2, "less", "Clinic", wilcoxon, "A2ci_boxplots.png")
 
     # aufgabe ii)
-    aufgabe(dose_1, dose_2, "two-sided", "Dose", t_test, "A2cii_boxplots.png")
+    aufgabe_ii(dose, "two-sided", "Dose", t_test)
 
 
 main()
