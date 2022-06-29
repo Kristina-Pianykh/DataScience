@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from numpy.testing import assert_array_almost_equal, assert_array_equal
 from typing import List, Tuple
 
 import numpy as np
@@ -110,13 +111,19 @@ class FeedforwardNetwork:
         :return: Fehlerwerte der n Trainingsbeispiele (Dim (n, 1))
         """
 
-        total = p.shape[0]
-        loss = np.zeros((total, 10), dtype="float32")
+        def npsumdot(x, y):
+            return np.sum(x * y, axis=1)
+
         log_transformation = np.apply_along_axis(np.log, 1, p)
-        # loss = -1 * npsumdot(log_transformation, y)
-        for row in range(total):
-            loss[row] = -1 * np.dot(log_transformation[row], y[row])
-        return loss[:, 0]
+        vectorized_loss = -1 * npsumdot(log_transformation, y)
+        # total = p.shape[0]
+        # loss = np.zeros((total, 10), dtype=np.float64)
+        # for row in range(total):
+        #     loss[row] = -1 * np.dot(log_transformation[row], y[row])
+        # loss_in_loop = loss[:, 0]
+
+        # assert np.equal(vectorized_loss, loss_in_loop).all()
+        return vectorized_loss
 
     def backward(self, x: np.ndarray, p: np.ndarray, y: np.ndarray):
         """
@@ -237,7 +244,7 @@ def to_one_hot_vectors(y: np.ndarray) -> np.ndarray:
     :return: Goldstandard-Klasse als One-Hot-Vektoren (Dim (n, 10))
     """
     n = y.shape[0]
-    categorical = np.zeros((n, 10), dtype="float32")
+    categorical = np.zeros((n, 10), dtype=np.float64)
     categorical[np.arange(n), y] = 1
     output_shape = y.shape + (10,)
     categorical = np.reshape(categorical, output_shape)
@@ -280,6 +287,10 @@ if __name__ == "__main__":
         print(f"Die Größe der Batches muss > 0 sein")
         exit(-1)
 
+    # data_file = Path("mnist.npz")
+    # train_size = 10000
+    # num_epochs = 35
+    # batch_size = 256
 
     # Laden der Daten aus Eingabedatei
     print(f"Lese die Trainings- und Testdaten von {data_file} ein")
