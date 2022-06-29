@@ -1,8 +1,8 @@
 import sys
-import numpy as np
-
-from typing import Tuple, List
 from pathlib import Path
+from typing import List, Tuple
+
+import numpy as np
 from sklearn.metrics import classification_report
 
 USAGE_DESCRIPTION = """
@@ -37,21 +37,23 @@ def create_batches(input: np.ndarray, n: int) -> List[np.ndarray]:
     l = len(input)
     batches = []
     for ndx in range(0, l, n):
-        batches.append(input[ndx:min(ndx + n, l)])
+        batches.append(input[ndx : min(ndx + n, l)])
 
     return batches
 
 
 class FeedforwardNetwork:
     """
-        Diese Klasse implementiert ein einfaches, einschichtiges neuronales Netzwerk.
+    Diese Klasse implementiert ein einfaches, einschichtiges neuronales Netzwerk.
     """
 
     def __init__(self, input_size: int, output_size: int):
         # Membervariablen zur Erfassung der Gewichte und Bias-Werte der linearen
         # Transformation. Die Gewichte und Bias-Werte werden mit zufälligen Werten
         # initialisiert.
-        self.weights = np.random.rand(input_size, output_size)  # Dimensionalität (<Anzahl-Features>, <Anzahl-Klassen>)
+        self.weights = np.random.rand(
+            input_size, output_size
+        )  # Dimensionalität (<Anzahl-Features>, <Anzahl-Klassen>)
         self.bias = np.random.rand(output_size)  # Dimensionalität (<Anzahl-Klassen>)
 
     def forward(self, x: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
@@ -69,7 +71,10 @@ class FeedforwardNetwork:
         :return: Tupel mit der Netzwerkausgabe (ohne Aktivierung) und den Aktivierungszuständen als
                  Numpy-Arrays (Dim (n, 10))
         """
-        raise NotImplementedError("ToDo: Diese Methode muss noch implementiert werden.")
+        not_activated = np.dot(x, self.weights) + self.bias
+        activated = np.apply_along_axis(softmax, 1, not_activated)
+
+        return not_activated, activated
 
     def predict_labels(self, p: np.ndarray) -> np.ndarray:
         """
@@ -82,7 +87,12 @@ class FeedforwardNetwork:
         :param p: Aktivierungszustände von n Beispielen (Dim (n, 10))
         :return: Vorhersage des Netzwerks (Dim (n, 1))
         """
-        raise NotImplementedError("ToDo: Diese Methode muss noch implementiert werden.")
+        total = p.shape[0]
+        predictions = np.zeros(total, dtype=np.float64)
+        for idx in range(total):
+            predictions[idx] = np.argmax(p[idx])
+
+        return predictions
 
     def loss(self, y: np.ndarray, p: np.ndarray) -> np.ndarray:
         """
@@ -99,7 +109,14 @@ class FeedforwardNetwork:
         :param p: Aktivierungszustände von n Beispielen (Dim (n, 10))
         :return: Fehlerwerte der n Trainingsbeispiele (Dim (n, 1))
         """
-        raise NotImplementedError("ToDo: Diese Methode muss noch implementiert werden.")
+
+        total = p.shape[0]
+        loss = np.zeros((total, 10), dtype="float32")
+        log_transformation = np.apply_along_axis(np.log, 1, p)
+        # loss = -1 * npsumdot(log_transformation, y)
+        for row in range(total):
+            loss[row] = -1 * np.dot(log_transformation[row], y[row])
+        return loss[:, 0]
 
     def backward(self, x: np.ndarray, p: np.ndarray, y: np.ndarray):
         """
@@ -119,9 +136,18 @@ class FeedforwardNetwork:
 
         :return: Tupel mit den Gradienten der Gewichte (Dim (768, 10)) und der Bias-Werte (Dim (10))
         """
-        raise NotImplementedError("ToDo: Diese Methode muss noch implementiert werden.")
+        grad_weights = -1 * (np.dot(x.T, y + (-p))).T
+        grad_bias = -1 * np.sum(y + (-p), axis=0)
+        return grad_weights.T, grad_bias
 
-    def fit(self, x: np.ndarray, y: np.ndarray, epochs: int, batch_size: int, learning_rate: float):
+    def fit(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        epochs: int,
+        batch_size: int,
+        learning_rate: float,
+    ):
         # Erzeuge Batches mit jeweils batch_size Trainingsbeispielen
         x_batches = create_batches(x, batch_size)
         y_batches = create_batches(y, batch_size)
@@ -156,7 +182,9 @@ class FeedforwardNetwork:
             loss = sum_loss / num_batches
             loss = round(loss, 6)
 
-            print(f" Epoche: {i + 1}/{epochs}   Fehler={loss}   Trainingsgenauigkeit={accuracy}")
+            print(
+                f" Epoche: {i + 1}/{epochs}   Fehler={loss}   Trainingsgenauigkeit={accuracy}"
+            )
 
         print("Training ist abgeschlossen\n")
 
@@ -184,7 +212,9 @@ class FeedforwardNetwork:
         print(classification_report(y_gold, y_pred, digits=3))
 
 
-def load_data(input_file: Path) -> Tuple[Tuple[np.ndarray, np.ndarray],Tuple[np.ndarray, np.ndarray]]:
+def load_data(
+    input_file: Path,
+) -> Tuple[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray]]:
     """
     Lädt die Daten aus der Eingabedatei.
 
@@ -215,6 +245,16 @@ def to_one_hot_vectors(y: np.ndarray) -> np.ndarray:
     return categorical
 
 
+def softmax(input_vector: np.ndarray) -> np.ndarray:
+    return np.exp(input_vector) / np.sum(np.exp(input_vector))
+
+
+def hypothesis(W: np.ndarray, x: np.ndarray, b: np.ndarray) -> np.ndarray:
+    g = np.zeros(b.shape, dtype=np.float64)
+    g = softmax(np.dot(W, x) + b)
+    return g
+
+
 if __name__ == "__main__":
     if len(sys.argv) != 5:
         print(USAGE_DESCRIPTION)
@@ -239,6 +279,7 @@ if __name__ == "__main__":
     if batch_size <= 0:
         print(f"Die Größe der Batches muss > 0 sein")
         exit(-1)
+
 
     # Laden der Daten aus Eingabedatei
     print(f"Lese die Trainings- und Testdaten von {data_file} ein")
@@ -265,7 +306,7 @@ if __name__ == "__main__":
 
     # Führe die gleichen Umwandlungen auch für die Testdaten durch
     x_test = x_test.reshape(x_test.shape[0], 28 * 28)
-    x_test = x_test.astype('float32')
+    x_test = x_test.astype("float32")
     x_test /= 255
     y_test_enc = to_one_hot_vectors(y_test)
 
@@ -274,9 +315,14 @@ if __name__ == "__main__":
 
     # Trainiere das Modell anhand der Trainingsdaten
     print(f"Starte das Training des Modells mit {len(x_train)} Beispielen")
-    ff_network.fit(x_train, y_train_enc, batch_size=batch_size, epochs=num_epochs, learning_rate=0.1)
+    ff_network.fit(
+        x_train,
+        y_train_enc,
+        batch_size=batch_size,
+        epochs=num_epochs,
+        learning_rate=0.1,
+    )
 
     # Evaluiere das Modell
     print("Starte die Evaluation des Modells")
     ff_network.evaluate(x_test, y_test, batch_size=batch_size)
-
