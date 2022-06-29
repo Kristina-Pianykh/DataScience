@@ -89,7 +89,7 @@ class FeedforwardNetwork:
         :return: Vorhersage des Netzwerks (Dim (n, 1))
         """
         total = p.shape[0]
-        predictions = np.zeros(total, dtype=np.float64)
+        predictions = np.zeros(total, dtype=np.float32)
         for idx in range(total):
             predictions[idx] = np.argmax(p[idx])
 
@@ -117,7 +117,7 @@ class FeedforwardNetwork:
         log_transformation = np.apply_along_axis(np.log, 1, p)
         vectorized_loss = -1 * npsumdot(log_transformation, y)
         # total = p.shape[0]
-        # loss = np.zeros((total, 10), dtype=np.float64)
+        # loss = np.zeros((total, 10), dtype=np.float32)
         # for row in range(total):
         #     loss[row] = -1 * np.dot(log_transformation[row], y[row])
         # loss_in_loop = loss[:, 0]
@@ -244,7 +244,7 @@ def to_one_hot_vectors(y: np.ndarray) -> np.ndarray:
     :return: Goldstandard-Klasse als One-Hot-Vektoren (Dim (n, 10))
     """
     n = y.shape[0]
-    categorical = np.zeros((n, 10), dtype=np.float64)
+    categorical = np.zeros((n, 10), dtype="float32")
     categorical[np.arange(n), y] = 1
     output_shape = y.shape + (10,)
     categorical = np.reshape(categorical, output_shape)
@@ -254,12 +254,6 @@ def to_one_hot_vectors(y: np.ndarray) -> np.ndarray:
 
 def softmax(input_vector: np.ndarray) -> np.ndarray:
     return np.exp(input_vector) / np.sum(np.exp(input_vector))
-
-
-def hypothesis(W: np.ndarray, x: np.ndarray, b: np.ndarray) -> np.ndarray:
-    g = np.zeros(b.shape, dtype=np.float64)
-    g = softmax(np.dot(W, x) + b)
-    return g
 
 
 if __name__ == "__main__":
