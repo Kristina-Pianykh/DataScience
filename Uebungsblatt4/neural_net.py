@@ -1,6 +1,12 @@
+# ---------------------------------------------------------------------------------------
+# Abgabegruppe: 24
+# Personen:
+# - Kristina Pianykh, pianykhk, 617331
+# - Miguel Nuno Carqueijeiro Athouguia, carqueim, 618203
+# - Winston Winston, winstonw, 602307
+# -------------------------------------------------------------------------------------
 import sys
 from pathlib import Path
-from numpy.testing import assert_array_almost_equal, assert_array_equal
 from typing import List, Tuple
 
 import numpy as np
@@ -9,17 +15,13 @@ from sklearn.metrics import classification_report
 USAGE_DESCRIPTION = """
 Das Skript wurde mit der falschen Anzahl an Parametern aufgerufen.
 Die korrekte Aufrufsyntax ist:
-
     python neural_net.py <eingabe_datei> <trainingsgroesse> <epochen> <batchgroesse>
         <eingabe_datei>    - Pfad zur Datei mit den Trainings- und Testdaten mnist.npz
         <trainingsgroesse> - Anzahl der zu verwendenden Trainingsbeispiele (0 für alle)
         <epochen>          - Anzahl der Trainingsepochen
         <batchgroesse>     - Anzahl der Trainingsinstanzen pro Batch
-
-
 Beispiel:
     Training eines Netzwerk mit 10.000 Trainingsbeispiel für 35 Epoche mit je 256 Instanzen pro Batch:
-
     python neural_net.py mnist.npz 10000 35 256
 """
 
@@ -30,7 +32,6 @@ np.random.seed(42)
 def create_batches(input: np.ndarray, n: int) -> List[np.ndarray]:
     """
     Teilt das übergebene Numpy-Array in Teilarrays der Größe n ein.
-
     :param input: Eingabe Numpy-Array
     :param n: Größe eines Batches
     :return: Liste mit allen Teilarrays
@@ -62,12 +63,10 @@ class FeedforwardNetwork:
         Diese Methode berechnet den Forward-Pass, d.h. die lineare Transformation der Eingabedaten und die Anwendung
         der Aktivierungsfunktion, für die in x gegebenen n Trainingsbeispiele. Als Aktivierungsfunktion soll die
         **Softmax-Funktion** genutzt werden.
-
         Die Eingabe der n Trainingsbeispiele erfolgt als Numpy-Array der Dimensionalität (n, 768). Als Rückgabe wird
         ein Tupel erwartet, welches die Netzwerkausgabe, d.h. die lineare Transformation ohne die Aktivierung, sowie
         die Aktivierungszustände des Netzwerks (nach Anwendung der Softmax-Funktion) repräsentiert. Beide Rückgaben
         sollen als Numpy-Float-Array der Dimensionalität (n, 10) erfolgen.
-
         :param x: Feature-Werte der n Eingabebeispiele (Dim. (n, 768))
         :return: Tupel mit der Netzwerkausgabe (ohne Aktivierung) und den Aktivierungszuständen als
                  Numpy-Arrays (Dim (n, 10))
@@ -81,10 +80,8 @@ class FeedforwardNetwork:
         """
         Diese Methode berechnet die Vorhersage, d.h. die vom Netzwerk geschätzte Klasse bzw. Ziffer, basierend auf den
         in p gegebenen (Softmax-) Aktivierungen von n Trainingsbeispielen.
-
         Die Eingabe von p erfolgt als Numpy-Float-Array der Dimensionalität (n, 10). Die Rückgabe der Labels soll
         als Numpy-Int-Array der Dimensionalität (n, 1) erfolgen.
-
         :param p: Aktivierungszustände von n Beispielen (Dim (n, 10))
         :return: Vorhersage des Netzwerks (Dim (n, 1))
         """
@@ -98,14 +95,11 @@ class FeedforwardNetwork:
     def loss(self, y: np.ndarray, p: np.ndarray) -> np.ndarray:
         """
         Diese Methode berechnet den Wert der **Cross-Entropy-Fehlerfunktion** für n Trainingsbeispiele.
-
         Der Eingabeparameter p der Methode erfasst die Aktivierungen für die n Trainingsbeispiele und ist als
         Numpy-Float-Array der Dimensionalität (n, 10) gegeben. Die Übergabe der Goldstandard-Labels erfolgt mittels
         One-Hot-Vektoren über den Parameter y. y wird als Numpy-Int-Array der Dimensionalität (n, 10) übergeben.
-
         Die Rückgabe soll als Numpy-Float-Array der Dimensionalität (n, 1), welches den Fehlerwert der jeweiligen
         Trainingsbeispiele enthält, erfolgen.
-
         :param y: Goldstandard-Klassen für n Beispiele repräsentiert als One-Hot-Vektoren (Dim (n, 10))
         :param p: Aktivierungszustände von n Beispielen (Dim (n, 10))
         :return: Fehlerwerte der n Trainingsbeispiele (Dim (n, 1))
@@ -116,31 +110,21 @@ class FeedforwardNetwork:
 
         log_transformation = np.apply_along_axis(np.log, 1, p)
         vectorized_loss = -1 * npsumdot(log_transformation, y)
-        # total = p.shape[0]
-        # loss = np.zeros((total, 10), dtype=np.float32)
-        # for row in range(total):
-        #     loss[row] = -1 * np.dot(log_transformation[row], y[row])
-        # loss_in_loop = loss[:, 0]
 
-        # assert np.equal(vectorized_loss, loss_in_loop).all()
         return vectorized_loss
 
     def backward(self, x: np.ndarray, p: np.ndarray, y: np.ndarray):
         """
         Diese Methode berechnet mittels Backpropagation die Gradienten der Gewichte und Bias-Werte für
         n Trainingsbeispiele.
-
         Die Eingabeparameter x und p repräsentieren hierbei die Features der n Trainingsbeispiele sowie die
         entsprechenden (Softmax) Aktivierungen des Netzwerks. Die Übergabe der Goldstandard-Klassen erfolgt als
         One-Hot-Vektoren über den Parameter y. y wird als Numpy-Int-Array der Dimensionalität (n, 10) übergeben.
-
         Als Rückgabe wird ein Tupel erwartet, welches die Gradienten der Gewichte (Numpy-Float-Array der
         Dimensionalität (768, 10)) und der Bias-Werte (Numpy-Float-Array der Dimensionalität (10)) erfasst.
-
         :param x: Feature-Werte der n Trainingsbeispiele (Dim (n, 768))
         :param p: (Softmax) Aktivierungszustände des Netzwerks der n Trainingsbeispiele (Dim (n, 10))
         :param y: Goldstandard-Klassen für n Beispiele repräsentiert als One-Hot-Vektoren (Dim (n, 10))
-
         :return: Tupel mit den Gradienten der Gewichte (Dim (768, 10)) und der Bias-Werte (Dim (10))
         """
         grad_weights = -1 * (np.dot(x.T, y + (-p))).T
@@ -224,7 +208,6 @@ def load_data(
 ) -> Tuple[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray]]:
     """
     Lädt die Daten aus der Eingabedatei.
-
     :param input_file: Pfad zur Eingabedatei
     :return: Tupel mit zwei Tupeln welches die Trainingsdaten und -klassen sowie die Testdaten und -klassen
              als Numpy-Array erfasst.
@@ -239,7 +222,6 @@ def load_data(
 def to_one_hot_vectors(y: np.ndarray) -> np.ndarray:
     """
     Diese Funktion wandelt die Goldstandard-Labels in One-Hot-Vektoren um.
-
     :param y: Goldstandard-Klassen als Array (n)
     :return: Goldstandard-Klasse als One-Hot-Vektoren (Dim (n, 10))
     """
@@ -280,11 +262,6 @@ if __name__ == "__main__":
     if batch_size <= 0:
         print(f"Die Größe der Batches muss > 0 sein")
         exit(-1)
-
-    # data_file = Path("mnist.npz")
-    # train_size = 10000
-    # num_epochs = 35
-    # batch_size = 256
 
     # Laden der Daten aus Eingabedatei
     print(f"Lese die Trainings- und Testdaten von {data_file} ein")
