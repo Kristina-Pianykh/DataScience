@@ -5,8 +5,12 @@ description = ""
 authors = ["Kristina Pianykh <kristinavrnrus@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.10,<3.11"
 numpy = "^1.23.1"
+scipy = "^1.8.1"
+sympy = "^1.10.1"
+flake8 = "^4.0.1"
+black = "^22.6.0"
 
 [tool.poetry.dev-dependencies]
 
