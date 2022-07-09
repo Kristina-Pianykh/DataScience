@@ -10,8 +10,8 @@ def predict(num):
     return 0
 
 
-def cross_enthropy(y_class, y_scores):
-    y_class_arr = np.asarray(y_class).reshape(-1)
+def cross_enthropy(y_class_true, y_scores):
+    y_class_arr = np.asarray(y_class_true).reshape(-1)
     y_scores_arr = np.asarray(y_scores).reshape(-1)
     result = -1 * np.dot(y_class_arr, np.log(y_scores_arr))
     return round(result, 6)
@@ -32,7 +32,7 @@ def neurons():
     print(f"or:\n{W.T}\n")
     x1 = np.array([2, -2, 4, 0, 1])
     x2 = np.array([-3, 2, 2, -1, 3])
-    b = np.array([1, 0.5])
+    b = np.array([1, -0.5])
     y1 = np.dot(W, x1) + b
     y2 = np.dot(W, x2) + b
     print(f"Eingabe x1: {y1}")
@@ -43,26 +43,28 @@ def neurons():
 
     class_pred_y1 = predict(z1)
     class_pred_y2 = predict(z2)
+    true_class_y1 = np.matrix("1; 0")
+    true_class_y2 = np.matrix("0; 1")
 
     print(
         f"Aktivierungszustände für y1 gegeben x1: {z1}. "
         f"The predicted class: {class_pred_y1}. "
-        f"The cross entrope error: {cross_enthropy(class_pred_y1, z1)}"
+        f"The cross entrope error: {cross_enthropy(true_class_y1, z1)}"
     )
     """
-    Aktivierungszustände für y1 gegeben x1: [[0.81757448 0.18242552]].
+    Aktivierungszustände für y1 gegeben x1: [[0.92414182 0.07585818]].
     The predicted class: [[1 0]].
-    The cross entrope error: 0.201413
+    The cross entrope error: 0.07889
     """
     print(
         f"Aktivierungszustände für y2 gegeben x2: {z2}. "
         f"The predicted class: {class_pred_y2}. "
-        f"The cross entrope error: {cross_enthropy(class_pred_y2, z2)}"
+        f"The cross entrope error: {cross_enthropy(true_class_y2, z2)}"
     )
     """
-    Aktivierungszustände für y2 gegeben x2: [[0.37754067 0.62245933]].
-    The predicted class: [[0 1]].
-    The cross entrope error: 0.474077
+    Aktivierungszustände für y2 gegeben x2: [[0.62245933 0.37754067]].
+    The predicted class: [[1 0]].
+    The cross entrope error: 0.974077
     """
 
 
