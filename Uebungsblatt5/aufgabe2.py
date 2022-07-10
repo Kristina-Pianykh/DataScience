@@ -68,7 +68,7 @@ def newton(start: Union[int, float], func: Callable):
     print(f"\nFinished in {iteration} iterations")
     print(f"y={y} for x={x}")
     return x
-
+    
 
 def main():
     print("Task a)\n")
