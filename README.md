@@ -1,6 +1,6 @@
 # DataScience
 
-This repository contains 5 projects for the module _Statistics and Data Science_ at the Humboldt University of Berlin.
+This repository contains 5 projects for the module _Statistics and Data Science_ at the Humboldt University of Berlin. All of these projects are aimed at the implementation of algorithms using the `Python Standard Library` and `pandas/NumPy`.
 
 #### Note:
 
@@ -11,7 +11,7 @@ To install project dependencies open a folder `Uebungsblatt*` in your editor and
 
 **Uebungsblatt0**:
 
-- exploratory analysis of a small dataset on sunshine hours over time using _pandas_
+- exploratory analysis of a small dataset on sunshine hours over time
 
   **Uebungsblatt1**:
 
@@ -21,7 +21,7 @@ To install project dependencies open a folder `Uebungsblatt*` in your editor and
 
 **Uebungsblatt2**:
 
-- implementation of exact and approximative permutation tests using only the standard Python library and performing an exact statistical hypothesis test with different hyper-parameters
+- implementation of exact and approximative permutation tests using only the `Python Standard Library` and performing an exact statistical hypothesis test with different hyper-parameters
 
 **Uebungsblatt3**:
 
@@ -33,7 +33,7 @@ To install project dependencies open a folder `Uebungsblatt*` in your editor and
 
 - examination of a prediction model's performance using evaluation metrics (precision, recall, F1-score, etc.)
 
-* implementation of a neural net to classify an image of a hand-written digit to its respective numerical value based on the MNIST-dataset and using only the Python standard library and NumPy
+* implementation of a neural net to classify an image of a hand-written digit to its respective numerical value based on the MNIST-dataset and using only the `Python Standard Library` and `NumPy`
 
 * evaluation of the model's behavior given different hyper-parameters (number of epochs, batch size, learning rate)
 
