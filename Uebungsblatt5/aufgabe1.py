@@ -1,6 +1,10 @@
 import numpy as np
 
 """
+This program computes the closed-form solution
+to the given linear regression equation.
+
+
 output of the program:
 X.T * X =
 [[ 5.  0.]
@@ -37,6 +41,7 @@ def main():
     y = np.asarray([2, 0, 0, 2, 6])
     w = compute_weights(x, y)
     print(f"a = {w[0]}, b = {w[1]}")
+
 
 if __name__ == "__main__":
     main()
