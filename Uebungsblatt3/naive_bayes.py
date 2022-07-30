@@ -1,10 +1,3 @@
-# ---------------------------------------------------------------------------------------
-# Abgabegruppe: 24
-# Personen:
-# - Kristina Pianykh, pianykhk, 617331
-# - Miguel Nuno Carqueijeiro Athouguia, carqueim, 618203
-# - Winston Winston, winstonw, 602307
-# -------------------------------------------------------------------------------------
 import sys
 from math import log
 from pathlib import Path
@@ -13,14 +6,14 @@ from typing import Any, Dict, List, Literal, Tuple
 import numpy as np
 
 USAGE_TEXT = """
-Das Skript wurde mit der falschen Anzahl an Parametern aufgerufen.
-Die korrekte Aufrufsyntax ist:
+The script was called with the wrong number of parameters.
+The correct call syntax is:
 
-    python naive_bayes.py <trainingsdatei> <testdatei>
-        <trainingsdatei> - Pfad zur Datei mit den Trainingsdaten
-        <testdatei>      - Pfad zur Datei mit den Testdaten
+    python naive_bayes.py <training file> <test file>
+        <trainingfile> - path to the file with the training data
+        <testfile> - path to the file with the test data
 
-Beispiel:
+Example:
 
     python naive_bayes.py imdb_train.tsv imdb_test_1.tsv
 """
@@ -28,11 +21,11 @@ Beispiel:
 
 def read_reviews(input_file: Path) -> List[Tuple[str, str]]:
     """
-        Liest die Filmbewertungen aus der Datei input_file und gibt diese
-        als Liste von Tupeln (<bewertungstext>, <label>) zurück.
+    Reads the movie ratings from the input_file and returns them
+    as a list of tuples (<evaluation text>, <label>).
 
-    :param input_file: Pfad zur Eingabedatei
-    :return: Filmbewertungen als Liste von Tupeln (<text>, <label>)
+     :param input_file: path to the input file
+     :return: film ratings as a list of tuples (<text>, <label>)
     """
     reviews = []
 
@@ -69,18 +62,19 @@ class NaiveBayesClassifier:
 
     def train(self, reviews: List[Tuple[str, str]]):
         """
-            Trainiert ein Naive Bayes Klassifikationsmodell basierend auf den in reviews gegebenen
-            Trainingsbeispielen. Die Trainingsbeispiele werden als Liste von Tupeln übergeben. Jedes
-            Tupel besteht aus dem Bewertungstext (1. Komponente) und dem Goldstandard-Klasse (2. Komponente).
+        Trains a Naive Bayes classification model based on the ones given in reviews
+        training examples. The training examples are passed as a list of tuples.
+        Each Tuple consists of the evaluation text (1st component) and
+        the gold standard class (2nd component).
 
-            Die Funktion schätzt die Wahrscheinlichkeit p(c), dass ein Review zur Klasse c € {pos, neg} gehört,
-            sowie die bedingte Wahrscheinlichkeit p(w|c), dass das Wort t in einem Review der Klasse c vorkommt,
-            für alle Klassen und Wörter und speichert diese in geeigneten Datenstrukturen (in den Attributen
-            der Klasse) ab.
+        The function estimates the probability p(c) that a review belongs to class
+        c € {pos, neg}, and the conditional probability p(w|c) that the word t occurs
+        in a class c review, for all classes and words and stores them in appropriate
+        data structures (in the attributes of the class).
 
-            Zur Aufteilung des Bewertungstext in einzelne Wörter wird das Leerzeichen verwendet.
+        Whitespaces are used as a separator between words in the text.
 
-        :param reviews: List von Filmbewertungen im Format (<bewertungstext>, <klasse>)
+        :param reviews: list of movie reviews in format (<review text>, <class>)
         """
         reviews_total = len(reviews)
         self.training_dataset_size = reviews_total
@@ -103,16 +97,16 @@ class NaiveBayesClassifier:
 
     def predict(self, reviews: List[str]) -> List[Tuple[str, float]]:
         """
-            Berechnet die Vorhersage für die in reviews gegebenen Filmbewertungen basierend auf dem
-            gelernten Modell. Die Filmbewertungen werden als Liste von Strings an die Funktion übergeben.
+        Calculates the prediction for the movie ratings given in reviews based on the
+        learned model. The movie ratings are passed to the function as a list of strings.
 
-            Die Funktion gibt die berechneten Klassen als Liste von Tupeln (<klasse>, <score)) zurück. Die erste
-            Komponente des Tupel repräsentiert dabei die vorhergesagte Klasse und die zweite Komponente den
-            berechneten Score der Klasse. Die Reihenfolge der Ergebnisliste entspricht dabei der Reihenfolge der
-            Filmkritiken in der Eingabeliste.
+        The function returns the computed classes as a list of tuples (<class>, <score)).
+        The first component of the tuple represents the predicted class and
+        the second component the calculated score of the class. The order of
+        the result list corresponds to the order of the Movie reviews in the input list.
 
-        :param reviews: Liste von Bewertungstexten als String
-        :return: Liste von Tupeln (<klasse>, <score>), die die Vorhersage des Modells festhalten
+        :param reviews: list of review texts as a string
+        :return: list of tuples (<class>, <score>) that reflect the model's prediction
         """
         log_label_probabilities = {
             sentiment: log(self.label_probabilities[sentiment])
@@ -152,21 +146,22 @@ class NaiveBayesClassifier:
         self, reviews: List[Tuple[str, str]], predictions: List[Tuple[str, float]]
     ) -> Tuple[float, float, float, float, float, float, float, float]:
         """
-        Diese Funktion nimmt eine Liste reviews von Filmbewertungen und eine dazugehörige Liste von Vorhersagen
-        predictions entgegen und berechnet darauf basierend verschiedene Evaluationsmaße. Die Trainingsbeispiele
-        werden als Liste von Tupeln (<text>, <klasse>) übergeben. Die Vorhersagen werden als Liste von Tupeln
-        (<klasse>, <score>) übergeben.
+        This function takes a reviews list of movie ratings and an associated list
+        of predictions and calculates various evaluation measures based on them.
+        The training examples are passed as a list of tuples (<text>, <class>).
+        The predictions are passed as a list of tuples (<class>, <score>).
 
-        Die Funktion gibt die erzielte Genauigkeit (Accuracy), Precision, Recall und den F1-Wert für beide Klassen
-        sowie den erzielten Micro- und Macro-F1-Wert als 8-Tupel zurück:
+        The function gives the achieved accuracy (Accuracy), Precision, Recall
+        and the F1 value for both classes as well as the achieved Micro and Macro F1
+        value as 8-tuple:
 
-        (<Pos-Precision>, <Pos-Recall>, <Pos-F1>, <Neg-Precision>, <Neg-Recall>, <Neg-F1>,  <F1-Micro>, <F1-Macro>)
+        (<Pos-Precision>, <Pos-Recall>, <Pos-F1>, <Neg-Precision>, <Neg-Recall>, <Neg-F1>, <F1-Micro>, <F1-Macro>)
 
-        Runden Sie alle Ergebnisse auf drei Nachkommastellen.
+        All results are rounded to three decimal places.
 
-        :param reviews: Liste von Filmbewertungen als Tupel (<Text>, <Klasse>)
-        :param predictions: Liste von dazugehörigen Vorhersagen (<Klasse>, <Score>)
-        :return: 8-Tupel  mit den erzielten Ergebnissen
+        :param reviews: list of movie ratings as tuples (<text>, <class>)
+        :param predictions: list of related predictions (<class>, <score>)
+        :return: 8-tuples with the results obtained
         """
         confusion_table = {"pos": {}, "neg": {}}
         results = {"pos": {}, "neg": {}}
