@@ -1,53 +1,45 @@
-# ---------------------------------------------------------------------------------------
-# Abgabegruppe: 24
-# Personen:
-# - Kristina Pianykh, pianykhk, 617331
-# - Miguel Nuno Carqueijeiro Athouguia, carqueim, 618203
-# - Winston Winston, winstonw, 602307
-# -------------------------------------------------------------------------------------
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from numpy.typing import NDArray
 from scipy.stats import iqr
 
-# Die Eingabedatei muss im gleichen Verzeichnis liegen wie die Skriptdatei exercise_2
+# the input files should be placed in the same folder as the script exercise_2
 input_file = Path("todesursachen.csv")
 data: pd.DataFrame = pd.read_csv(input_file, sep=";", header=0)
 
 def aufgabe_a1() -> int:
     """
-    Ermitteln Sie die Anzahl an verschiedenen (“unique”) Todesursachen, die im Datensatz erfasst werden.
+    Determines the number of different ("unique") causes of death
+    that are recorded in the data set.
 
-    :return: Anzahl der verschiedenen Todesursachen im Datensatz (als int)
+    :return: number of different causes of death in the data set (as int)
     """
     unique_deaths = data["Todesursache"].unique().size
     return unique_deaths
-    raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
 
 
 def aufgabe_a2() -> Dict[str, Union[int, float]]:
     """
-    Geben Sie den Durchschnitt (mean), den Median (med), die Standardabweichung (stddev), den minimalen Wert (min),
-    den maximalen Wert (max), den Interquartilsabstand (iqr) und das 90%-Perzentil (90p) der Verstorbenen pro Jahr
-    an.
+    Gives the mean, the median, the standard deviation, the minimum value,
+    the maximum value, the interquartile range, and the 90% percentile
+    of deceased per year.
 
-    Die Rückgabe der Kennzahlen erfolgt als Dictionary mit folgendem Aufbau:
+    The return of the ratios is done as a dictionary with the following structure:
     {
-        "mean": <Durchschnitt (float)>,
-        "med": <Median (int)>,
-        "stddev": <Standardabweichung (float)>,
-        "min": <Minimaler-Wert (float)>,
-        "max": <Maximaler-Wert (int)>,
-        "iqr": <Interquartilsabstand (float)>,
-        "90p": <90%-Perzentil (int)>
+        "mean": <average (float)>,
+        "med": <median (int)>,
+        "stddev": <standard deviation (float)>,
+        "min": <minimum value (float)>,
+        "max": <maximum value (int)>,
+        "iqr": <interquartile range (float)>,
+        "90p": <90%percentile (int)>.
     }
 
-    Die Kennzahlen sind entweder als float oder als int anzugeben (siehe Aufbaubeschreibung)
+    The values in the dictionary are to be specified either as float or as int.
 
-    :return: Dictionary mit den Kennzahlen
+    :return: Dictionary with the descriptive statistics
     """
     death_stats: Dict[str, Union[int, float]] = {}
     deaths = data.groupby(["Jahr"]).sum()["Anzahl"]
@@ -62,18 +54,15 @@ def aufgabe_a2() -> Dict[str, Union[int, float]]:
 
     return death_stats
 
-    raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
-
 
 def aufgabe_a3() -> Dict[int, str]:
     """
-    Ermitteln Sie die Anzahl der Kinder bzw. Heranwachsenden (< 15 Jahre), welche an einer Ursache verstorben sind,
-    an welcher in dem jeweiligen Jahr auch mindestens 10 andere Kinder / Heranwachsende verstorben sind.
-    Ermitteln Sie diese Kennzahl für jedes im Datensatz erfasste Jahr.
+    Determines the number of children or adolescents (< 15 years) who died from one cause,
+    from which at least 10 other children/adolescents also died in that year.
+    Determines this ratio for each year covered in the data set.
 
-    Die Rückgabe erfolgt als Dictionary, welches ein Jahr (int) auf die Anzahl an verstorbenen Kindern (int)
-    abbildet.
-
+    The return is a dictionary that maps a year (int) to the number of children (int) who died.
+  
     {
         1980: 101234,
         1981: 12456,
@@ -81,9 +70,10 @@ def aufgabe_a3() -> Dict[int, str]:
         ....
 
     }
-    (Beispiel zeigt exemplarische, nicht-korrekte Werte!)
+    (example shows exemplary values!)
 
-    :return: Dictionary, welches ein Jahr (int) auf die Anzahl an verstorbenen Kindern (int) abbildet.
+    :return: dictionary with a year as the key (int)
+    and the number of deceased children as the value (int).
     """
     kids_10 = data[
         ((data["Altersgruppe"] == "unter 1 Jahr") | (data["Altersgruppe"] == "1 bis unter 15 Jahre"))
@@ -93,16 +83,14 @@ def aufgabe_a3() -> Dict[int, str]:
     dicti = {year: str(filtered[year]) for year in filtered}
 
     return dicti
-    raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
 
 
 def aufgabe_b1() -> int:
     """
-    In welchem Jahr sind die meisten Männer durch Stürze ums Leben gekommen?
+    In which year did the most men die from falling?
+    An int is expected as a return value, which specifies the respective year.
 
-    Als Rückgabe wird ein int erwartet, welcher das jeweilige Jahr angibt.
-
-    :return: Jahr (int) in dem am meisten Männer durch Stürze ums Leben gekommen sind
+    :return: year (int) in which most men died from falling
     """
     final_data = data[
         (data["Geschlecht"] == "männlich") & (data["Todesursache"] == "Stürze")
@@ -111,22 +99,19 @@ def aufgabe_b1() -> int:
     year: int = final_data[
         final_data["Anzahl"] == final_data["Anzahl"].max()
     ].reset_index()["Jahr"][0]
-    
+ 
     return year
-    raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
 
 
 def aufgabe_b2() -> Tuple[float, float]:
     """
-    Ertrinken im Durchschnitt mehr Kinder bzw. Heranwachsende (< 15 Jahre) oder mehr Menschen im
-    Rentenalter (>= 65 Jahre) pro Jahr?
+    Do more children and adolescents (< 15 years) or more people of retirement age (>= 65 years)
+    drown each year, on average?
 
-    Als Rückgabe wird ein Pair von float-Zahlen erwartet, welche die beiden Durchschnittswerte der jeweiligen
-    Personengruppen angeben:
+    The expected return is a pair of float numbers that indicate
+    the two means of the respective groups.
 
-    (<Durchschnitt-Kinder (float)>, <Durchschnitt-Renter*innen (float)>)
-
-    :return: (<Durchschnitt-Kinder (float)>, <Durchschnitt-Renter*innen (float)>)
+    :return: (<average-children (float)>, <average-pensioners (float)>)
     """
     kids_age_groups = [
         "unter 1 Jahr",
@@ -144,32 +129,25 @@ def aufgabe_b2() -> Tuple[float, float]:
     drowned_old_fucks = drowned_set[drowned_set["Altersgruppe"].isin(old_age_groups)].groupby(["Jahr"]).sum()["Anzahl"]
     return (round(np.mean(drowned_kids), 4), round(np.mean(drowned_old_fucks), 4))
 
-    raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
-
 
 def aufgabe_b3() -> str:
     """
-    Welche Altersgruppe weist den größten Median hinsichtlich der Anzahl an Verstorbenen pro Jahr aus?
+    Which age group has the largest median of deaths per year?
 
-    Als Rückgabe wird die Beschreibung der Altersgruppe als string erwartet (bspw. "15 bis unter 20 Jahre")
-
-    :return: Altersgruppe mit dem größten Median hinsichtlich der Anzahl an Verstorbenen pro Jahr
+    :return: age group with the largest median number of deceased per year (str).
     """
-    # age_groups_medians: pd.DataFrame = data.groupby(["Altersgruppe", "Jahr"]).median().reset_index()
     age_groups_medians = data.groupby(["Altersgruppe", "Jahr"]).sum("Anzahl").reset_index().groupby(["Altersgruppe"]).median()
     age_with_big_median = age_groups_medians[age_groups_medians["Anzahl"] == age_groups_medians["Anzahl"].max()].reset_index()["Altersgruppe"].values[0]
 
     return age_with_big_median
-    raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
 
 
 def aufgabe_b4() -> float:
     """
-    In wieviel Prozent der erfassten Jahre sind mehr Frauen als Männer in einem Jahr gestorben?
+    How many more women died then men per year percentagewise?
+    The expected return is a float between 0 and 1.
 
-    Als Rückgabe wird ein float zwischen 0 und 1 erwartet.
-
-    :return: Anteil der Jahre in denen mehr Frauen als Männer verstorben sind (als float)
+    :return: percentage of years in which more women than men died (as float).
     """
     men_women_grouped_by_year = data.groupby(["Jahr", "Geschlecht"]).sum()
     unique_years = data["Jahr"].unique()
@@ -184,26 +162,26 @@ def aufgabe_b4() -> float:
 
     return float(years_more_women_died / total_years)
 
-    raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
-
 
 def aufgabe_b5() -> List[Tuple[float, float]]:
     """
-    Welche Todesursachen weisen die größten Unterschiede zwischen Männern und Frauen im Alter von >= 20 Jahren und
-    < 30 auf? Berechnen Sie hierzu die absoluten Differenz der Durchschnittswerte pro Jahr und Todesursache und
-    geben Sie die drei Todesursachen mit den größten durchschnittlichen Differenzen an.
+    Which causes of death show the greatest differences between men and women
+    aged >= 20 years and < 30? Calculate the absolute difference of the average
+    values per year and cause of death and give three causes of death with
+    the largest average differences.
 
-    Als Rückgabe wird eine drei-elementige Liste erwartet, welche die Todesursachen mit den größten Differenzen
-    zwischen Männern und Frauen (absteigend geordnet) enthält. Jedes Element der Liste ist dabei ein Pair (2-Tupel)
-    bestehend aus dem Namen der Todesursache und der durchschnittlichen Differenz. Beispiel:
+    The expected return is a three-item list showing the causes of death with
+    the largest differences between men and women (in descending order).
+    Every element of the list is a pair (2-tuple) consisting of the name
+    of the cause of death and the average difference. Example:
 
     [
-        ("BN des Magens", 245.45),
-        ("Diabetes mellitus", 200.87),
-        ("Krankheiten der Niere", 196.5)
+        ("BN of stomach," 245.45),
+        ("Diabetes mellitus," 200.87),
+        [ "Diseases of the kidney," 196.5]
     ]
 
-    :return: Drei-elementige Liste mit den Todesursachen mit den größten Unterschieden zwischen Männern und Frauen.
+    :return: three-element list of causes of death with the largest differences between men and women.
     """
     death_causes_with_largest_diffs: List[Tuple[float, float]] = []
     age_groups = ['20 bis unter 25 Jahre', '25 bis unter 30 Jahre']
@@ -216,27 +194,26 @@ def aufgabe_b5() -> List[Tuple[float, float]]:
         death_causes_with_largest_diffs.append((row[0], row[-1]))
     return death_causes_with_largest_diffs
 
-    raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
-
 
 def aufgabe_b6() -> List[Tuple[str, float]]:
     """
-    Welche Todesursachen weisen die kleinsten Schwankungen hinsichtlich der Anzahl an Verstorbenen pro Jahr auf?
-    Berechnen Sie hierzu die Standardabweichungen der einzelnen Todesursachen und setzen Sie diese in Relation
-    zu deren jeweiligen Durchschnittswert. Geben Sie die drei Todesursachen mit den größten (relativen)
-    Standardabweichungen an.
+    Which causes of death show the smallest fluctuations in terms of
+    the number of deaths per year? Calculate the standard deviations
+    of the individual causes of death and relate them to their respective means.
+    Give three causes of death with the largest (relative) standard deviations.
 
-    Als Rückgabe wird eine drei-elementige Liste erwartet, welche die Todesursachen mit den kleinsten Schwankungen
-    (absteigend geordnet) enthält. Jedes Element der Liste ist dabei ein Pair (2-Tupel) bestehend aus dem Namen
-    der Todesursache und der (relativen) Standardabweichung. Beispiel:
+    The expected return is a three-element list containing the causes of death
+    with the smallest variations (in descending order). Every element of the list
+    is a pair (2-tuple) consisting of the name of the death cause and the (relative)
+    standard deviation. Example:
 
     [
-        ("BN des Magens", 0.123),
-        ("Diabetes mellitus", 0.104),
-        ("Krankheiten der Niere", 0.0965)
+        ("BN of stomach," 0.123),
+        ("Diabetes mellitus," 0.104),
+        ("diseases of the kidney," 0.0965)
     ]
 
-    :return: Drei-elementige Liste mit den Todesursachen mit den höchsten Schwankungen.
+    :return: three-element list of death causes with the highest variation
     """
     deaths_least_std: List[Tuple[str, float]] = []
     mean = data[["Todesursache", "Jahr", "Anzahl"]].groupby(["Todesursache", "Jahr"]).sum().reset_index().groupby("Todesursache").mean()
@@ -248,8 +225,6 @@ def aufgabe_b6() -> List[Tuple[str, float]]:
         deaths_least_std.append((entry[2], round(entry[-1], 4)))
 
     return deaths_least_std
-
-    raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
 
 
 if __name__ == "__main__":
