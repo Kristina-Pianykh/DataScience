@@ -19,9 +19,9 @@ To install project dependencies open a folder `Uebungsblatt*` in your editor and
 
 * generation of a maltitude of simulated samples from a limited dataset by bootstrapping (a resampling technique with replacement)
 
-  **Uebungsblatt2**:
+**Uebungsblatt2**:
 
-  - implementation of exact and approximative permutation tests using only the standard Python library and performing an exact statistical hypothesis test with different hyper-parameters
+- implementation of exact and approximative permutation tests using only the standard Python library and performing an exact statistical hypothesis test with different hyper-parameters
 
 **Uebungsblatt3**:
 
