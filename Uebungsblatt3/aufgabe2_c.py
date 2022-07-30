@@ -64,8 +64,8 @@ def boxplot(series1: pd.Series, series2: pd.Series, boxplot_name: str):
 
     sns.boxplot(ax=axes[0], data=series1.to_frame())
     sns.boxplot(ax=axes[1], data=series2.to_frame())
-    # plt.savefig(boxplot_name)
-    # plt.show()
+    plt.savefig(boxplot_name)
+    plt.show()
 
 
 def aufgabe(
@@ -110,9 +110,9 @@ def aufgabe_ii(series: pd.Series, alternative: str, category: str, test: Callabl
 
     sns.set_style("whitegrid")
     plot = sns.boxplot(data=series.to_frame())
-    # plot.set_ylabel("Reaction time in seconds")
-    # plt.savefig("A3cii_boxplot.png")
-    # plt.show()
+    plot.set_ylabel("Reaction time in seconds")
+    plt.savefig("A3cii_boxplot.png")
+    plt.show()
 
     # print(f"The outlier in the sample for Cinic 2: {max(duration_2)}\n")
 
@@ -122,13 +122,6 @@ def aufgabe_ii(series: pd.Series, alternative: str, category: str, test: Callabl
     )
     print(f"statisic={test.statistic}")
     print(f"p-value={test.pvalue}\n")
-
-    # test2 = wilcoxon(duration_2, alternative)
-    # print(
-    #     f"Results of the non-parametric one-tailed Wilcoxon signed-rank test for {category} 2:"
-    # )
-    # print(f"statisic={test2.statistic}")
-    # print(f"p-value={test2.pvalue}\n")
 
 
 def main():
@@ -141,10 +134,11 @@ def main():
     dose = data["Dose"]
 
     # aufgabe i)
-    # aufgabe(duration_1, duration_2, "less", "Clinic", wilcoxon, "A2ci_boxplots.png")
+    aufgabe(duration_1, duration_2, "less", "Clinic", wilcoxon, "A2ci_boxplots.png")
 
     # aufgabe ii)
     aufgabe_ii(dose, "two-sided", "Dose", t_test)
 
 
-main()
+if __name__ == "__main__":
+    main()

@@ -48,9 +48,11 @@ def ks_test(series1: pd.Series, series2: pd.Series):
 
 
 def wilc_test(data: pd.DataFrame, category: str) -> Tuple[float, float]:
-    # Wilcoxon rank-sum test for independent samples with continuous distribution
+    """
+    Wilcoxon rank-sum test for independent samples with continuous distribution
+    """
     t, p = stats.ranksums(data["Bottom"], data["Top"], alternative="two-sided")
-    print("Wilcoxon rank-sum test for independent samples with same dsitribution")
+    print("Wilcoxon rank-sum test for independent samples with same distribution")
     print(
         "============================================================================"
     )
@@ -85,8 +87,8 @@ def auf2b_ii(data: pd.DataFrame):
     sns.boxplot(ax=axes[0], data=true_money[["Bottom", "Top"]])
 
     sns.boxplot(ax=axes[1], data=fake_money[["Bottom", "Top"]])
-    # plt.savefig("A2b_boxplots.png")
-    # plt.show()
+    plt.savefig("A2b_boxplots.png")
+    plt.show()
 
     normality_test(true_money, "true")
     normality_test(fake_money, "forged")
@@ -112,8 +114,8 @@ def auf2b_i(data: pd.DataFrame):
     fig, axes = plt.subplots(1, 1, sharex=True)
     fig.suptitle("Boxplot of the width for the bottom and the top of the bank notes")
     sns.boxplot(ax=axes, data=data[["Bottom", "Top"]])
-    # plt.savefig("A2b_boxplot.png")
-    # plt.show()
+    plt.savefig("A2b_boxplot.png")
+    plt.show()
 
     normality_test(data, "all")
 
@@ -121,7 +123,9 @@ def auf2b_i(data: pd.DataFrame):
         f"Samples have variance p={var_equality(data['Bottom'], data['Top'])}"
     )  # null hypothesis: both samples have equal variance
 
-    # two-tailed Kolmogorov-Smirnov Test
+    """
+    two-tailed Kolmogorov-Smirnov Test
+    """
     result = ks_test(data["Bottom"], data["Top"])
 
 
@@ -129,7 +133,7 @@ def main():
     file = Path("banknote.dat")
     data = read_values(file)
     auf2b_ii(data)
-    # auf2b_i(data)
+    auf2b_i(data)
 
 
 main()

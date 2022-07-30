@@ -1,12 +1,7 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from scipy import stats
-
-# def var_equality(series1: np.ndarray, series2: np.ndarray):
-#     _, p = stats.levene(series1, series2, center="mean")
-#     return p
 
 
 def main():
@@ -16,10 +11,6 @@ def main():
     K = np.array(
         [0.70, 0.58, 0.64, 0.70, 0.69, 0.80, 0.71, 0.63, 0.82, 0.60, 0.91, 0.59]
     )
-
-    # print(
-    #     f"Samples have variance (p={var_equality(B, K)}"
-    # )  # null hypothesis: both samples have equal variance
 
     _, B_p = stats.normaltest(B)
     _, K_p = stats.normaltest(K)
@@ -32,24 +23,20 @@ def main():
     # else:
     #     print("The null hypothesis cannot be rejected")
 
-    # Wilcoxon signed-rank test for independent samples with continuous disitribution
+    """
+    Wilcoxon signed-rank test for independent samples with continuous distribution
+    """
     t, p = stats.wilcoxon(B, K, alternative="greater")
     print("Wilcoxon rank-sum test for independent samples with same dsitribution")
     print(f"t statistic : {round(t, 4)}")
     print(f"p-value : {round(p, 4)}")
 
-    # t-test, no variance assumption
-    # print("t-test, no variance assumption")
-    # t, p = stats.ttest_ind(B, K, equal_var=False, alternative="greater")
-    # print(f"t statistic : {round(t, 4)}")
-    # print(f"p-value : {round(p, 4)}")
-
     data = pd.DataFrame({"Group K": K, "Group B": B})
     sns.set_style("whitegrid")
     plot = sns.boxplot(data=data)
     plot.set_ylabel("Reaction time in seconds")
-    # plt.savefig("A2_boxplot.png")
-    # plt.show()
+    plt.savefig("A2_boxplot.png")
+    plt.show()
 
 
 main()
