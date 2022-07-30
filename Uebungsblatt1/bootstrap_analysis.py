@@ -52,6 +52,7 @@ def main():
         upper bounds of the 75%-confidence intervals: {stddev_end}
 
     """)
-   
 
-main()
+
+if __name__ == "__main__":
+    main()
