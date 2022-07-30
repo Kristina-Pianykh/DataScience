@@ -1,30 +1,23 @@
-# ---------------------------------------------------------------------------------------
-# Abgabegruppe: 24
-# Personen:
-# - Kristina Pianykh, pianykhk, 617331
-# - Miguel Nuno Carqueijeiro Athouguia, carqueim, 618203
-# - Winston Winston, winstonw, 602307
-# -------------------------------------------------------------------------------------
 import random
 import sys
 from pathlib import Path
 from typing import Generic, List, Set, Tuple, TypeVar
 
 USAGE_TEXT = """
-Das Skript wurde mit der falschen Anzahl an Parametern aufgerufen.
-Die korrekte Aufrufsyntax ist:
+The script was called with the wrong number of parameters.
+The correct call syntax is:
 
-    python permutationtest.py <sample-datei1> <sample-datei2> <alpha> <modus>
-        <sample-datei1> - Eingabedatei mit den Werten der ersten Stichprobe
-        <sample-datei2> - Eingabedatei mit den Werten der zweiten Stichprobe
-        <alpha>         - Signifikanzniveau (im Bereich (0,1))
-        <modus>         - Modus der Berechnung, exakt (exact) oder approximativ (approx)
+    python permutationtest.py <sample-file1> <sample-file2> <alpha> <mode>
+        <sample-file1> - input file with the values of the first sample
+        <sample-file2> - input file with the values of the second sample
+        <alpha> - significance level (in the range (0,1))
+        <mode> - mode of calculation, exact (exact) or approximate (approx)
 
-Beispiel:
+Example:
 
     python permutationtest.py sample1.txt sample2.txt 0.05 exact
 
-        oder
+        or
 
     python permutationtest.py sample1.txt sample2.txt 0.05 approx 10000
 
@@ -35,8 +28,10 @@ TValue = TypeVar("TValue", bound=int)
 
 class HashableSet(set, Generic[TValue]):
     def __hash__(self) -> int:
-        """Calculate the hash by adding the weighted by idx sum for values
-        as values are sorted in a set."""
+        """
+        Calculate the hash by adding the weighted by idx sum for values
+        as values are sorted in a set.
+        """
         return sum(i + v for i, v in enumerate(self))
 
 
@@ -93,20 +88,22 @@ def get_elements_by_idx(idx_set: Set[int], lookup_lst: List[float]) -> List[floa
 
 def run_exact_permutationtest(samples1: List[float], samples2: List[float]) -> Tuple[float, float]:
     """
-    Diese Funktion testet, ob sich die Erwartungswerte der beiden Stichproben samples1 und samples2
-    signifikant unterscheiden durch Prüfung aller möglichen Permutationen. Die (alternative) Hypothese
-    nimmt an, dass sich die Erwartungswerte der beiden Populationen unterscheiden ((E(samples1) != E(samples2)).
-    Die Null-Hypothese nimmt hingegen an, dass die Samples aus Populationen mit dem gleichen Erwartungswert stammen
-    (E(samples1) = E(samples2)).
+    This function tests whether the expected values of the two samples
+    (samples1 and samples2) differ significantly by testing all possible permutations.
+    The (alternative) hypothesis assumes that the expected values of the two populations
+    differ ((E(samples1) != E(samples2)).
+    The null hypothesis, on the other hand, assumes that the samples come
+    from populations with the same expected value (E(samples1) = E(samples2)).
 
-    Die Funktion gibt die Differenz der Erwartungswerte der Stichproben und den p-Wert des Tests zurück. Der p-Wert
-    quantifiziert die Wahrscheinlichkeit, den gleichen oder einen noch größeren (absoluten) Unterschied der
-    Erwartungswerte zu beobachten, wenn die Nullhypothese, dass die Stichproben aus Populationen mit demselben
-    Erwartungswert gezogen wurden, wahr ist.
+    The function returns the difference in the expected values of the samples
+    and the p-value of the test. The p-value quantifies the probability of observing
+    the same or an even larger (absolute) difference in expected if the null hypothesis
+    that the samples were drawn from populations with the same expected value is true.
 
-    :param samples1: Liste der beobachteten Werte aus der ersten Stichprobe
-    :param samples2: Liste der beobachteten Werte aus der zweiten Stichprobe
-    :return: Tuple bestehend aus der Differenz der Mittelwerte und dem p-Wert des Tests: (mean-diff,p)
+    :param samples1: list of observed values from the 1st sample
+    :param samples2: list of observed values from the 2nd sample
+    :return: tuple consisting of the difference in the means and
+    the p-value of the test: (mean-diff,p)
     """
     observed_mean_diff = get_mean(samples2) - get_mean(samples1)
     mean_diffs: List[float] = []
@@ -128,21 +125,25 @@ def run_exact_permutationtest(samples1: List[float], samples2: List[float]) -> T
 
 def run_approx_permutationtest(samples1: List[float], samples2: List[float], n: int) -> Tuple[float, float]:
     """
-    Diese Funktion testet, ob sich die Erwartungswerte der beiden Stichproben samples1 und samples2
-    signifikant unterscheiden durch Prüfung von n zufälligen, duplikatfreien Permutationen. Die (alternative)
-    Hypothese nimmt an, dass sich die Erwartungswerte der beiden Populationen unterscheiden
-    ((E(samples1) != E(samples2)). Die Null-Hypothese nimmt hingegen an, dass die Samples aus Populationen
-    mit dem gleichen Erwartungswert stammen (E(samples1) = E(samples2)).
+    This function tests whether the expected values of the two samples
+    (samples1 and samples2) differ significantly by testing n random,
+    duplicate-free permutations. The (alternative) hypothesis assumes
+    that the expected values of the two populations are different
+    ((E(samples1) != E(samples2)).
+    The null hypothesis, on the other hand, assumes that the samples
+    come from populations with the same expected value (E(samples1) = E(samples2)).
 
-    Die Funktion gibt die Differenz der Erwartungswerte der Stichproben und den p-Wert des Tests zurück. Der p-Wert
-    quantifiziert die Wahrscheinlichkeit, den gleichen oder einen noch größeren (absoluten) Unterschied der
-    Erwartungswerte zu beobachten, wenn die Nullhypothese, dass die Stichproben aus Populationen mit demselben
-    Erwartungswert gezogen wurden, wahr ist.
+    The function returns the difference in the expected values of the
+    samples and the p-value of the test. The p-value quantifies the probability
+    of observing the same or an even larger (absolute) difference in expected
+    if the null hypothesis that the samples were drawn from populations with
+    the same expected value is true.
 
-    :param samples1: Liste der beobachteten Werte aus der ersten Stichprobe
-    :param samples2: Liste der beobachteten Werte aus der zweiten Stichprobe
-    :param n: Anzahl der zu bildenden zufälligen, duplikatfreien Permutationen
-    :return: Tuple bestehend aus der Differenz der Mittelwerte und dem p-Wert des Tests: (mean-diff,p)
+    :param samples1: list of observed values from the 1st sample
+    :param samples2: list of observed values from the 2nd sample
+    :param n: number of random, duplicate-free permutations to be formed
+    :return: tuple consisting of the difference of the means and the p-value
+    of the test: (mean-diff,p)
     """
     sample_size = len(samples1)
     both_samples: List[float] = samples1 + samples2
