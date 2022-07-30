@@ -1,15 +1,8 @@
-# ---------------------------------------------------------------------------------------
-# Abgabegruppe: 24
-# Personen:
-# - Kristina Pianykh, pianykhk, 617331
-# - Miguel Nuno Carqueijeiro Athouguia, carqueim, 618203
-# - Winston Winston, winstonw, 602307
-# -------------------------------------------------------------------------------------
 import random
 import sys
 from math import ceil, floor, sqrt
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import List, Tuple
 
 USAGE_TEXT = """
 Das Skript wurde mit der falschen Anzahl an Parametern aufgerufen.
@@ -68,46 +61,44 @@ def get_stddev(lst: List[float]) -> float:
 
 def compute_bootstrapping_medians(samples: List[float], n: int, m: int) -> List[float]:
     """
-    Bildet basierend auf dem übergebenen Werten eines Samples n Bootstrapping-Stichproben mit jeweils
-    m Werten und berechnet jeweils das mittlere Element dieser Bootstrapping-Stichprobe. Die Funktion
-    gibt die Liste der berechneten mittleren Elemente zurück.
+    Based on the given values of a sample, forms n bootstrapping samples, each with
+    m values and calculates the mean element of each bootstrapping sample.
+    The function returns the list of calculated means.
 
-    :param samples: Liste der Werte des ursprünglichen Examples
-    :param n: Anzahl der zu bildenden Bootstrapping-Stichproben
-    :param m: Anzahl der Elemente je Bootstrapping-Stichprobe
+    :param samples: list of input values
+    :param n: number of bootstrapping samples to be formed
+    :param m: number of elements per bootstrapping sample
 
-    :return: Liste mit den mittleren Elementen der n Bootstrapping-Stichproben
+    :return: list with the means of the n bootstrapping samples
     """
     medians: List[float] = []
 
     for sample in range(n):
         new_sample = random.choices(samples, k=m)
         medians.append(get_median(new_sample))
-    
+
     return medians
-    raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
 
 
 def get_standard_error(bootstrap_medians: List[float]) -> float:
     """
-    Gibt den Stichprobenfehler / Standardfehler der übergebenen Liste von mittleren Elemente
-    des Bootstrappings zurück.
+    Returns the sampling error / standard error of the given list of median values
+    from the bootstrapped samples.
 
-    :param bootstrap_medians: Liste der berechneten Mediane aus dem Bootstrapping
-    :return: Standardfehler der Bootstrapping-Mediane
+    :param bootstrap_medians: list of the calculated medians from bootstrapped samples
+    :return: standard error of the bootstrapping medians
     """
     return get_stddev(bootstrap_medians)
-    raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
 
 
 def get_confidence_interval(bootstrap_medians: List[float], p: float) -> Tuple[float, float]:
     """
-    Berechnet das p-% Konfidenzintervall der übergebenen Liste an Bootstrapping-Mediane.
+    Calculates the p-% confidence interval of the passed list of bootstrapped medians.
 
-    :param bootstrap_medians: Liste der berechneten Mediane aus dem Bootstrapping
-    :param p: Zu ermittelndes Konfidenzintervall im Bereich (0,1)
+    :param bootstrap_medians: list of the calculated medians from the bootstrapped samples
+    :param p: confidence interval in the range (0,1)
 
-    :return: Start- und Endwerte des Konfidenzintervalls (jeweils als float)
+    :return: start and end values of the confidence interval (each as float)
     """
     sorted_medians = sorted(bootstrap_medians)
     within_interval_fl: float = float(len(bootstrap_medians)) * p
@@ -125,8 +116,6 @@ def get_confidence_interval(bootstrap_medians: List[float], p: float) -> Tuple[f
     lower_idx: int = 0 + to_remove
     upper_idx: int = (len(sorted_medians) - to_remove) - 1
     return (sorted_medians[lower_idx], sorted_medians[upper_idx])
-
-    raise NotImplementedError("ToDo: Funktion muss noch implementiert werden!")
 
 
 if __name__ == "__main__":
