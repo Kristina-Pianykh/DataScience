@@ -13,7 +13,7 @@ To install project dependencies open a folder `Uebungsblatt*` in your editor and
 
 - exploratory analysis of a small dataset on sunshine hours over time
 
-  **Uebungsblatt1**:
+**Uebungsblatt1**:
 
 - descriptive statistical analysis of the data on death causes across different age groups and genders over time
 
