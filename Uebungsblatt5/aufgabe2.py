@@ -1,9 +1,14 @@
+from math import isclose, pow
 from typing import Callable, Union
+
 import numpy as np
-from math import pow, isclose
 from scipy.misc import derivative
 
 """
+This program applies Newton's algorithm to compute
+zeros of the functions provided in A2.pdf
+
+
 Output of the program:
 Task a)
 

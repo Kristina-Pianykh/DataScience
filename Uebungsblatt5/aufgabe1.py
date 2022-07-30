@@ -2,7 +2,8 @@ import numpy as np
 
 """
 This program computes the closed-form solution
-to the given linear regression equation.
+to the given linear regression equation in A1.pdf.
+(the full solution can also be found in A1.pdf)
 
 
 output of the program:
