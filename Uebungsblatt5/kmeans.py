@@ -1,72 +1,68 @@
-# ---------------------------------------------------------------------------------------
-# Abgabegruppe: 24
-# Personen:
-# - Kristina Pianykh, pianykhk, 617331
-# - Miguel Nuno Carqueijeiro Athouguia, carqueim, 618203
-# - Winston Winston, winstonw, 602307
-# -------------------------------------------------------------------------------------
-import matplotlib
-import numpy as np
 import random
 import sys
 from copy import deepcopy
-
-import seaborn as sns
-import matplotlib.pyplot as plt
-import pandas as pd
-
 from pathlib import Path
-from sklearn.manifold import TSNE
 from typing import Tuple
 
-USAGE_DESCRIPTION = """
-Das Skript wurde mit der falschen Anzahl an Parametern aufgerufen.
-Die korrekte Aufrufsyntax ist:
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.manifold import TSNE
 
-    python kmeans.py <eingabe_datei> <anzahl_datenpunkte> <k> <max_iterationen>
-        <eingabe_datei>      - Pfad zur Datei mit den Trainings- und Testdaten mnist.npz
-        <anzahl_datenpunkte> - Anzahl der zu verwendenden Datenpunkte
-        <k>                  - Anzahl der zu ermittelnden Cluster
-        <max_iterationen>    - Maximale Anzahl an Iterationen
-    
-Beispiel:
-    python kmeans.py mnist.npz 2000 10 50
+USAGE_DESCRIPTION = """
+The script was called with the wrong number of parameters.
+The correct calling syntax is:
+
+     python kmeans.py <input_file> <number_of_datapoints> <k> <max_iterations>
+        <input_file> - path to the file containing the training and testing data mnist.npz
+        <number_datapoints> - number of datapoints
+        <k> - number of clusters to determine
+        <max_iterations> - maximum number of iterations
+
+Example:
+     python kmeans.py mnist.npz 2000 10 50
 """
 
 
 class KMeans:
     def init_clusters(self, points: np.ndarray, k: int) -> np.ndarray:
         """
-        Diese Methode berechnet die initialen zufälligen Clusterzentren. Hierzu werden aus den in points gegebenen
-        Datenpunkten zufällig k Punkte als Clusterzentren ausgewählt.
+        This method calculates the initial random cluster centers.
+        For this purpose, from the given data points select k random
+        points to be the initial cluster centers.
 
-        Die Übergabe der Datenpunkte erfolgt NumPy-Array der Dimensionalität (n, m), wobei n die Anzahl der Datenpunkte
-        und m die Anzahl der Merkmale pro Datenpunkt repräsentiert. Die Rückgabe der gewählten Clustermittelpunkte
-        erfolgt als NumPy-Array der Dimensionalität (k, m).
+        The data points are passed as a NumPy array of dimensionality (n, m)
+        where n is the number of data points and m represents the number of
+        features per data point. Returning the chosen cluster centers is done
+        in a NumPy array of dimensionality (k, m).
 
-        :param points: Datenpunkte als NumPy-Array (Dim. (n, m))
-        :param k: Anzahl an zu identifizierenden Clustern
-        :return: Zufällig gewählte Clusterzentren als NumPy-Array (Dim. (k, m))
+        :param points: data points as NumPy array (Dim. (n, m))
+        :param k: number of clusters to compute
+        :return: randomly chosen cluster centers as NumPy array (Dim. (k, m))
         """
         random_indices = random.sample(range(points.shape[0]), k)
         return points[random_indices, :]
 
     def compute_distances(self, points: np.ndarray, centers: np.ndarray) -> np.ndarray:
         """
-        Diese Methode berechnet den euklidischen Abstand zwischen jedem der in points gegebenen Datenpunkte und jedem
-        der in centers gegebenen Clusterzentren.
+        This method calculates the Euclidean distance between each of the data
+        points and each of the cluster centers.
 
-        Die Übergabe der Parameter points und centers erfolgt als NumPy-Array der Dimensionalität (n, m) bzw. (k, m),
-        wobei n die Anzahl der Datenpunkte, k die Anzahl der Clusterzentren und m die Anzahl der Features je
-        Datenpunkt bzw. Clusterzentrum repräsentiert.
+        The points and centers parameters are passed as a NumPy array with the
+        dimensionality (n, m) or (k, m) where n is the number of data points,
+        k is the number of cluster centers, and m is the number of features that
+        represent a data point or cluster center.
 
-        Die Rückgabe erfolgt als NumPy-Array der Dimensionalität (n, k). Hierbei hält die i-te Zeile die Abstände
-        des i-ten Datenpunktes zu jedem der k Clusterzentren fest. Die i-te Zeile und j-te Spalte erfasst
-        dementsprechend den Abstand zwischen dem i-ten Datenpunkt und dem j-ten Clusterzentrum aus der Eingabe.
+        The return value is a NumPy array of dimensionality (n, k). Here,
+        the i-th line holds the distances of the i-th data point to each of
+        the k cluster centers. The i th row and j th column capture the distance
+        between the i-th data point and the j-th cluster center, respectively.
 
-        :param points: Datenpunkte als NumPy-Array (Dim. (n, m))
-        :param centers: Clusterzentren als NumPy-Array (Dim. (k, m))
-        :return: Abstandsmatrix als NumPy-Array (Dim (n, k))
+        :param points: data points as NumPy array (Dim. (n, m))
+        :param centers: cluster centers as NumPy array (Dim. (k, m))
+        :return: distance matrix as NumPy array (Dim(n,k))
         """
         distances = np.zeros((points.shape[0], centers.shape[0]), dtype="float32")
 
@@ -79,21 +75,26 @@ class KMeans:
 
     def compute_cluster_assignments(self, distances: np.ndarray) -> np.ndarray:
         """
-        Diese Methode berechnet die Zuordnung der Datenpunkte zu einem Cluster basierend auf den in distances gegebenen
-        Abständen zwischen den Datenpunkten und den Clusterzentren. Ein Datenpunkt wird hierbei dem Cluster zugeordnet,
-        zu dem es den geringsten Abstand besitzt.
+        This method calculates the assignment of the data points to a cluster
+        based on those given in distances between the data points and the cluster
+        centers. A data point is assigned to the cluster, to which it has
+        the smallest distance.
 
-        Die Übergabe der Abstände erfolgt als NumPy-Array der Dimensionalität (n, k), wobei n die Anzahl der Datenpunkte
-        und k die Anzahl der Clusterzentren repräsentiert. Die i-te Zeile und j-te Spalte von distances erfasst den
-        Abstand zwischen dem i-ten Datenpunkt und dem j-ten Clusterzentrum  Der Eintrag distances[0][1] gibt bspw. den
-        Abstand zwischen dem ersten Datenpunkt und dem zweiten Clusterzentrum wieder.
+        The distances are passed as a NumPy array of dimensionality (n, k)
+        where n is the number of data points and k represents the number of cluster
+        centers. The i-th row and j-th column of distances captures the distance
+        between the i-th data point and the j-th cluster center. For example,
+        the entry distances[0][1] reflects the distance between the 1st data point
+        and the 2nd cluster center.
 
-        Die Rückgabe der Zuordnung erfolgt als NumPy-Array der Länge n. Der i-te Eintrag erfasst dabei das zugeordnete
-        Cluster des i-ten Datenpunkts. Das zugeordnete Cluster wird über dessen Index (von 0 bis k-1) repräsentiert.
-        Wird der i-te Datenpunkt bspw. dem dritten Cluster zugeordnet, so ist der i-te Eintrag der Rückgabe 2 (als int).
+        The return value is a NumPy array of cluster assignments of length n.
+        The i-th entry reflects the cluster assignment of the i-th data point.
+        The assigned cluster is represented by its index (from 0 to k-1).
+        For example, if the i-th data point is assigned to the 3rd cluster,
+        the i-th entry is returned as 2 (as an int).
 
-        :param distances: Abstandsmatrix als NumPy-Array (Dim. (n, k))
-        :return: Clusterzuordnung als NumPy-Array (Dim (n))
+        :param distances: distance matrix as NumPy array (Dim.(n,k))
+        :return: cluster mapping as NumPy array (Dim(n))
         """
         cluster_assignments = np.zeros(distances.shape[0], dtype=int)
         min_distances = np.min(distances, axis=1)
@@ -109,21 +110,24 @@ class KMeans:
         self, points: np.ndarray, assignments: np.ndarray, k: int
     ) -> np.ndarray:
         """
-         Diese Methode berechnet die neuen Zentren der k Cluster basierend auf den in points gegebenen Datenpunkten und
-         den in assignments festgehalten Clusterzuordnungen. Das neue Zentrum eines Clusters wird über den Mittelwert
-         (pro Merkmal) der einem Cluster zugeordneten Datenpunkte gebildet.
+        This method calculates the new centers of the k clusters
+        based on the data points and the cluster assignments passed as input.
+        The new cluster is calculated as the mean (per feature) of the data
+        points assigned to one cluster.
 
-         Die Übergabe der Datenpunkte erfolgt als NumPy der Dimensionalität (n, m). Die Clusterzuordnung assignments
-         ist als NumPy-Array der Länge n gegeben. Die Cluster sind hierbei als Index von 0 bis k-1 erfasst.
+        The data points are passed as NumPy of dimensionality (n, m).
+        The cluster map assignments are passed as a NumPy array of length n.
+        The clusters are numbered based on their array index from 0 to k-1.
 
-         Die Rückgabe der neuen Clusterzentren erfolgt als NumPy-Array der Dimensionalität (k, m), wobei m die Anzahl
-         der Merkmale je Datenpunkte bzw. Clusterzentrum sei. Die i-te Zeile erfasst das (neue) Clusterzentrum des
-         Clusters mit dem Index i.
+        The new cluster centers are returned as a NumPy array of dimensionality (k, m)
+        where m is the count of the features per data point or cluster center.
+        The i-th line captures the (new) cluster center of the clusters with index i.
 
-        :param points: Datenpunkte als NumPy-Array (Dim. (n, m))
-        :param assignments: Zuordnung der Datenpunkte zu Clusterzentren als NumPy-Array (Dim (n))
-        :param k: Anzahl Cluster
-        :return: Neue Clusterzentren als NumPy-Array (Dim. (k, m))
+        :param points: data points as NumPy array (Dim. (n, m))
+        :param assignments: assignment of data points to cluster centers as
+        NumPy array (Dim (n))
+        :param k: number of clusters
+        :return: new cluster centers as NumPy array (Dim. (k, m))
         """
         new_cluster_centers = np.zeros((k, points.shape[1]), dtype="float32")
         for idx in range(k):
@@ -134,20 +138,22 @@ class KMeans:
 
     def cluster(self, points: np.ndarray, k: int, max_iterations: int) -> np.ndarray:
         """
-        Diese Methode berechnet eine Aufteilung der in points gegebenen Datenpunkte in k Cluster mittels des
-        k-Means-Algorithmus. Der Algorithmus wird solange durchgeführt bis kein Datenpunkt einem neuen Cluster
-        zugeordnet wird (max_iterations=0) oder max_iterations Iterationen durchgeführt wurden.
+        This method calculates a division of the data points into k clusters
+        using the k-means algorithm. The algorithm is carried out until no
+        data point has been reaasigned to a new cluster (max_iterations=0)
+        or the number of max iterations has been reached.
 
-        Zur Implementierung können Sie die zuvor implementierten Methoden des Templates nutzen. Die Übergabe der
-        Datenpunkte erfolgt als NumPy-Array der Dimensionalität (n, m), wobei n die Anzahl der Datenpunkte und m die
-        Anzahl der Merkmale je Datenpunkte repräsentiert. Die Parameter k und max_iterations werden als int übergeben.
+        The data points are passed as a NumPy array of dimensionality (n,m)
+        where n is the number of datapoints and m is the number of features
+        per data point. The k and max_iterations parameters are passed as an int.
 
-        Die Methode gibt die Zuordnung der Datenpunkte zu den jeweiligen Clustern als NumPy-Array der Länge n zurück.
+        The method returns the assignment of the data points to the respective
+        clusters as a NumPy array of length n.
 
-        :param points: Datenpunkte als NumPy-Array (Dim. (n, m))
-        :param k: Anzahl Cluster
-        :param max_iterations: Maximale Anzahl an Iterationen oder 0 für unbegrenzte Durchführung
-        :return: Clusterzuordnung als NumPy-Array (Dim (n))
+        :param points: data points as NumPy array (Dim. (n, m))
+        :param k: number of clusters
+        :param max_iterations: maximum number of iterations or 0 for unlimited execution
+        :return: cluster mapping as NumPy array (Dim(n))
         """
         cluster_assignments = np.zeros(points.shape[0], dtype=int)
         old_cluster_assignments = np.ones(
@@ -178,11 +184,11 @@ class KMeans:
 
 def load_data(input_file: Path) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Lädt die Daten aus der Eingabedatei.
+    Loads the data from the input file.
 
-    :param input_file: Pfad zur Eingabedatei
-    :return: Tupel mit zwei Tupeln welches die Trainingsdaten und -klassen sowie die Testdaten und -klassen
-             als Numpy-Array erfasst.
+    :param input_file: path to the input file
+    :return: tuple with the training data and lables and the test data and labels,
+    each as a numpy array.
     """
     with np.load(str(input_file), allow_pickle=True) as f:
         x_train, y_train = f["x_train"], f["y_train"]
@@ -198,13 +204,14 @@ def generate_cluster_goldstandard_comparison(
     points: np.ndarray, gold_labels: np.ndarray, assignments: np.ndarray
 ):
     """
-    Erzeugt einen Vergleich der Goldstandard-Klassifikation der Datenpunkte und der identifizierten Cluster
-    des Algorithmus. Hierzu werden die Datenpunkte zunächst mittels t-SNE auf zwei Dimensionen reduziert
-    und dann mittels Scatterplots dargestellt.
+    Produces a comparison of the gold standard classification of the data points
+    and the identified clusters of the algorithm. For this purpose,
+    the data points are first reduced to two dimensions using t-SNE and
+    then represented by scatterplots.
 
-    :param points: Datenpunkte als NumPy-Array (Dim. (n, m))
-    :param gold_labels: Goldstandard-Klassifikation als NumPy-Array (Dim. (n))
-    :param assignments: Clusterzuordnung der Datenpunkte als NumPy-Array (Dim (n))
+    :param points: data points as NumPy array (Dim. (n, m))
+    :param gold_labels: gold standard classification as NumPy array (Dim.(n))
+    :param assignments: cluster assignment of the data points as NumPy array (Dim (n))
     """
     # Reduziere die Datenpunkte auf 2D mit TSNE
     tsne = TSNE(n_components=2, init="pca", learning_rate="auto", random_state=42)
@@ -248,12 +255,12 @@ def generate_cluster_examples(
     points: np.ndarray, assignments: np.ndarray, k: int, num_examples: int
 ):
     """
-    Erstellt eine Übersicht mit num_examples zufällig gewählten Beispielen pro Cluster.
+    Generates an overview with num_examples randomly chosen examples per cluster.
 
-    :param points: Datenpunkte als NumPy-Array (Dim. (n, m))
-    :param assignments: Clusterzuordnung der Datenpunkte als NumPy-Array (Dim (n))
-    :param k: Anzahl der Cluster
-    :param num_examples: Anzahl an Datenpunkten pro Cluster
+    :param points: data points as NumPy array (Dim. (n, m))
+    :param assignments: cluster assignment of the data points as NumPy array (Dim (n))
+    :param k: number of clusters
+    :param num_examples: number of data points per cluster
     """
     fig, axes = matplotlib.pyplot.subplots(k, num_examples, figsize=(20, 30))
     for cluster_id in range(k):
