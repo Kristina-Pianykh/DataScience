@@ -1,0 +1,99 @@
+Lösungen für a)
+	1: Anzahl an verschiedenen (“unique”) Todesursachen:
+		79
+
+	2: Kennzahlen der Verstorbenen pro Jahr:
+		90p: 2235568
+		iqr: 171254.0
+		max: 2289743
+		mean: 2105197.0
+		median: 2096607
+		min: 1945188
+		stddev: 103610.0
+
+	3: Anzahl der verstorbenen Kinder bzw. Heranwachsenden (< 15 Jahre) pro Jahr:
+		1980: 25643
+		1981: 23924
+		1982: 22424
+		1983: 20440
+		1984: 18432
+		1985: 17625
+		1986: 17206
+		1987: 16296
+		1988: 16370
+		1989: 15336
+		1990: 16111
+		1991: 14791
+		1992: 12943
+		1993: 12385
+		1994: 11520
+		1995: 10663
+		1996: 9927
+		1997: 9808
+		1998: 9133
+		1999: 8753
+		2000: 8262
+		2001: 7944
+		2002: 7250
+		2003: 7274
+		2004: 6536
+		2005: 6331
+		2006: 5660
+		2007: 5640
+		2008: 5363
+		2009: 5185
+		2010: 4970
+		2011: 5063
+		2012: 4540
+		2013: 4577
+		2014: 4454
+		2015: 4741
+		2016: 5247
+		2017: 4850
+		2018: 4951
+		2019: 4861
+		2020: 4462
+
+Lösungen für b)
+	1: In welchem Jahr sind die meisten Männer durch Stürze ums Leben gekommen?
+		2020
+
+	2: Ertrinken im Durchschnitt mehr Kinder bzw. Heranwachsende (< 15 Jahre) oder mehr Menschen im Rentenalter (>= 65 Jahre) pro Jahr?
+		Durchschnitt Kinder: 125.22
+		Durchschnitt Rentner:innen: 162.46
+
+	3: Welche Altersgruppe weist den größten Median hinsichtlich der Anzahl an Verstorbenen pro Jahr aus?
+Altersgruppe
+85 Jahre und mehr        548824.0
+80 bis unter 85 Jahre    363997.0
+75 bis unter 80 Jahre    308160.0
+70 bis unter 75 Jahre    247042.0
+65 bis unter 70 Jahre    188279.0
+60 bis unter 65 Jahre    147714.0
+55 bis unter 60 Jahre     97175.0
+50 bis unter 55 Jahre     62681.0
+45 bis unter 50 Jahre     42948.0
+40 bis unter 45 Jahre     27422.0
+35 bis unter 40 Jahre     17237.0
+30 bis unter 35 Jahre     11277.0
+25 bis unter 30 Jahre      6845.0
+20 bis unter 25 Jahre      6618.0
+15 bis unter 20 Jahre      5175.0
+unter 1 Jahr               4666.0
+1 bis unter 15 Jahre       3909.0
+dtype: float64
+		85 Jahre und mehr
+
+	4: In wieviel Prozent der erfassten Jahre sind mehr Frauen als Männer in einem Jahr gestorben?
+		80.49%
+
+	5:Welche Todesursachen weisen die größten Unterschiede zwischen Männern und Frauen auf?
+		0: BN d. Larynx, d. Trachea, d. Bronchien u. d. Lunge (19086.22)
+		1: BN der Bronchien und der Lunge (17865.46)
+		2: BN der Prostata (11672.73)
+
+	6:Welche Todesursachen weisen die kleinsten Schwankungen hinsichtlich der Anzahl an Verstorbenen pro Jahr auf?
+		0: Krankheiten des Verdauungssystems (0.04185501839079666)
+		1: Neubildungen (0.05024446588509253)
+		2: Bösartige Neubildungen (BN) (0.050723709813946916)
+

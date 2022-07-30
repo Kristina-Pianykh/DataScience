@@ -1,0 +1,80 @@
+Lösungen für a)
+	1: Anzahl an verschiedenen (“unique”) Todesursachen:
+		79
+
+	2: Kennzahlen der Verstorbenen pro Jahr:
+		90p: 2235568
+		iqr: 171254.0
+		max: 2289743
+		mean: 2105197.0
+		median: 2096607
+		min: 1945188.0
+		stddev: 103610.0
+
+	3: Anzahl der verstorbenen Kinder bzw. Heranwachsenden (< 15 Jahre) pro Jahr:
+		1980: 25643
+		1981: 23924
+		1982: 22424
+		1983: 20440
+		1984: 18432
+		1985: 17625
+		1986: 17206
+		1987: 16296
+		1988: 16370
+		1989: 15336
+		1990: 16111
+		1991: 14791
+		1992: 12943
+		1993: 12385
+		1994: 11520
+		1995: 10663
+		1996: 9927
+		1997: 9808
+		1998: 9133
+		1999: 8753
+		2000: 8262
+		2001: 7944
+		2002: 7250
+		2003: 7274
+		2004: 6536
+		2005: 6331
+		2006: 5660
+		2007: 5640
+		2008: 5363
+		2009: 5185
+		2010: 4970
+		2011: 5063
+		2012: 4540
+		2013: 4577
+		2014: 4454
+		2015: 4741
+		2016: 5247
+		2017: 4850
+		2018: 4951
+		2019: 4861
+		2020: 4462
+
+Lösungen für b)
+	1: In welchem Jahr sind die meisten Männer durch Stürze ums Leben gekommen?
+		2020
+
+	2: Ertrinken im Durchschnitt mehr Kinder bzw. Heranwachsende (< 15 Jahre) oder mehr Menschen im Rentenalter (>= 65 Jahre) pro Jahr?
+		Durchschnitt Kinder: 125.22
+		Durchschnitt Rentner:innen: 162.46
+
+	3: Welche Altersgruppe weist den größten Median hinsichtlich der Anzahl an Verstorbenen pro Jahr aus?
+		75 bis unter 80 Jahre
+
+	4: In wieviel Prozent der erfassten Jahre sind mehr Frauen als Männer in einem Jahr gestorben?
+		50.0%
+
+	5:Welche Todesursachen weisen die größten Unterschiede zwischen Männern und Frauen auf?
+		0: Äußere Ursachen von Morbidität und Mortalität (2186.0)
+		1: Äußere Ursachen von Morbidität und Mortalität (2152.0)
+		2: Äußere Ursachen von Morbidität und Mortalität (2150.5)
+
+	6:Welche Todesursachen weisen die kleinsten Schwankungen hinsichtlich der Anzahl an Verstorbenen pro Jahr auf?
+		0: Exposition gegenüber Rauch, Feuer und Flammen (0.7844)
+		1: Vorsätzliche Selbstbeschädigung (0.7486)
+		2: Tätlicher Angriff (0.6918)
+
